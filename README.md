@@ -1,40 +1,18 @@
-# Turborepo kitchen sink starter
 
-This Turborepo starter is maintained by the Turborepo core team.
+## What's Inside?
 
-This example also shows how to use [Workspace Configurations](https://turbo.build/docs/core-concepts/monorepos/configuring-workspaces).
+This monorepo, built with Turborepo, includes the following applications and packages:
 
-## Using this example
+### Applications
 
-Run the following command:
+- **`api`**: A backend server built with [Express](https://expressjs.com/).
+- **`kioku`**: A frontend application powered by [Next.js](https://nextjs.org/).
 
-```sh
-npx create-turbo@latest -e kitchen-sink
-```
+### Packages
 
-## What's inside?
+- **`@repo/eslint-config`**: Shared ESLint configurations for consistent code quality.
+- **`@repo/jest-presets`**: Common Jest configurations for testing.
+- **`@repo/logger`**: A lightweight, isomorphic logging utility.
+- **`@repo/typescript-config`**: Shared `tsconfig.json` files for TypeScript projects.
+- **`@repo/types`**: Reusable TypeScript types for the entire monorepo.
 
-This Turborepo includes the following packages and apps:
-
-### Apps and Packages
-
-- `api`: an [Express](https://expressjs.com/) server
-- `storefront`: a [Next.js](https://nextjs.org/) app
-- `admin`: a [Vite](https://vitejs.dev/) single page app
-- `blog`: a [Remix](https://remix.run/) blog
-- `@repo/eslint-config`: ESLint configurations used throughout the monorepo
-- `@repo/jest-presets`: Jest configurations
-- `@repo/logger`: isomorphic logger (a small wrapper around console.log)
-- `@repo/ui`: a dummy React UI library (which contains `<CounterButton>` and `<Link>` components)
-- `@repo/typescript-config`: tsconfig.json's used throughout the monorepo
-
-Each package and app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Jest](https://jestjs.io) test runner for all things JavaScript
-- [Prettier](https://prettier.io) for code formatting
