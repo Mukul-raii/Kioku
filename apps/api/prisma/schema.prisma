@@ -1,0 +1,71 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          Int           @id @default(autoincrement())
+  name        String
+  userId      String        @unique
+  email       String        @unique
+  imageUrl    String?
+  learningLog LearningLog[]
+  category    Category[]
+}
+
+model Category {
+  id            Int           @id @default(autoincrement()) // Primary key
+  catergoryName String // Name of the category
+  user          User          @relation(fields: [userId], references: [userId]) // Relation to User
+  userId        String // Foreign key for User
+  learningLogs  LearningLog[] // Relation to LearningLog
+  createdDate   DateTime      @default(now()) // Automatically set creation date
+}
+
+model LearningLog {
+  id          Int       @id @default(autoincrement())
+  user        User      @relation(fields: [userId], references: [userId])
+  userId      String
+  date        DateTime
+  topic       String
+  //category    Category @relation(fields: [categoryId], references: [id])
+  // categoryId  Int
+  category    String
+  notes       String
+  review      Review[]
+  createdDate DateTime  @updatedAt
+  Category    Category? @relation(fields: [categoryId], references: [id])
+  categoryId  Int?
+}
+
+model Review {
+  id          Int           @id @default(autoincrement())
+  learningLog LearningLog   @relation(fields: [logId], references: [id])
+  logId       Int
+  createdDate DateTime      @updatedAt
+  testResult  TestResults[]
+}
+
+model TestResults {
+  id              Int      @id @default(autoincrement())
+  review          Review   @relation(fields: [reviewId], references: [id])
+  reviewId        Int
+  miniTopic       String
+  lastScore       Int
+  currentInterval Int
+  RepetitionCount Int
+  nextReviewDate  DateTime
+  lastReviewed    DateTime @updatedAt
+}
+
+

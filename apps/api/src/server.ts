@@ -1,22 +1,19 @@
-import { json, urlencoded } from "body-parser";
-import express, { type Express } from "express";
-import morgan from "morgan";
 import cors from "cors";
+import express from "express";
+import { configDotenv } from "dotenv";
+import bodyParser from "body-parser";
+import User from "./routes/user";
+import LearningLog from "./routes/learningLog";
+import Review from "./routes/review";
+const app = express();
 
-export const createServer = (): Express => {
-  const app = express();
-  app
-    .disable("x-powered-by")
-    .use(morgan("dev"))
-    .use(urlencoded({ extended: true }))
-    .use(json())
-    .use(cors())
-    .get("/message/:name", (req, res) => {
-      return res.json({ message: `hello ${req.params.name}` });
-    })
-    .get("/status", (_, res) => {
-      return res.json({ ok: true });
-    });
 
-  return app;
-};
+app.use(cors());
+app.use(bodyParser.json({ limit: "10mb" }));
+app.use(bodyParser.urlencoded({ limit: "10mb", extended: true }));
+
+app.use("/api/v1/user", User);
+app.use("/api/v1/learningLog", LearningLog);
+app.use("/api/v1/review", Review);
+
+export {app}
