@@ -1,3 +1,4 @@
+import { New_Learning_Log } from "@repo/types";
 import axios from "axios";
 
 export const getAllLearningLogs = async (userId: string) => {
@@ -7,7 +8,7 @@ export const getAllLearningLogs = async (userId: string) => {
   return response.data;
 };
 
-export const newLearningLogs = async (data) => {
+export const newLearningLogs = async (data: New_Learning_Log) => {
   const response = await axios.post(
     `${process.env.NEXT_PUBLIC_BACKEND_API}/learningLog/new_learning_log`,
     { data }
@@ -20,6 +21,10 @@ export const check_test_result = async ({
   question,
   correctAnswer,
   userAnswer,
+}: {
+  question: string;
+  correctAnswer: string;
+  userAnswer: string;
 }) => {
   const response = await axios.post(
     `${process.env.NEXT_PUBLIC_BACKEND_API}/learningLog/check_test_result`,
@@ -28,18 +33,15 @@ export const check_test_result = async ({
   return response.data.test;
 };
 
-export const get_a_test = async (id) => {
-  console.log("id to review ", id);
-
-  const response = await axios.get(
-    `${process.env.NEXT_PUBLIC_BACKEND_API}/learningLog/get_a_test?id=${id}`
+export const get_a_test = async (id: number, isSubtopic: number) => {
+  const response = await axios.post(
+    `${process.env.NEXT_PUBLIC_BACKEND_API}/learningLog/get_a_test?id=${id}`,
+    { isSubtopic }
   );
   return response.data.test;
 };
 
 export const get_a_test_result = async (id: number, result) => {
-  console.log(id, result);
-
   const response = await axios.post(
     `${process.env.NEXT_PUBLIC_BACKEND_API}/learningLog/get_a_test_result`,
     { id, result }
@@ -48,3 +50,11 @@ export const get_a_test_result = async (id: number, result) => {
 
   return response.data;
 };
+
+export const get_a_test_result_sub_topic = async (id: number, result) => {
+  const response = await axios.post(
+    `${process.env.NEXT_PUBLIC_BACKEND_API}/learningLog/get_a_sub_test_result`,
+    { id, result }
+  );
+  console.log(response);
+}

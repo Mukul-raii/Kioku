@@ -15,24 +15,45 @@ import {
 import { Badge } from "./ui/badge";
 import { Skeleton } from "./ui/skeleton";
 
-export default function ReviewList({ reviewToLog }) {
-  
+export default function ReviewList({
+  reviewToLog,
+  isSubTopic,
+}: {
+  reviewToLog: number;
+  isSubTopic: number;
+}) {
   const { user } = useUser();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [subTopicRevision, setSubTopicRevision] = useState(null);
 
   useEffect(() => {
     async function fetchData() {
       try {
         setLoading(true);
-        const res = await getAllRevision(user?.id);
+        const res = await getAllRevision(user?.id || "");
         setData(res);
+        const subtopic = res?.miniTopics.flatMap((subtopi) =>
+          subtopi.review.map((test) =>
+            test.testResult.map((q) => ({
+              test: test.logId,
+              category: subtopi.category,
+              id: q.id,
+              miniTopic: q.miniTopic,
+              lastScore: q.lastScore,
+              reviewDate: q.nextReviewDate,
+            }))
+          )
+        );
+        setSubTopicRevision(subtopic[0]);
+        console.log(subtopic);
       } catch (error) {
         console.error("Error fetching revision data:", error);
       } finally {
         setLoading(false);
       }
     }
+    console.log(subTopicRevision);
 
     if (user?.id) {
       fetchData();
@@ -164,6 +185,75 @@ export default function ReviewList({ reviewToLog }) {
           ))}
         </div>
       )}
+
+      <div>
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-bold tracking-tight">
+            Your Revision Sub-Topics
+          </h1>
+          <Badge variant="outline" className="px-3 py-1">
+            {Array.isArray(subTopicRevision) ? subTopicRevision.length : 0} Sub
+            Topics
+          </Badge>
+        </div>
+
+        {!Array.isArray(subTopicRevision) || subTopicRevision.length === 0 ? (
+          <Card className="p-8 text-center">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-muted mb-4">
+              <ClipboardList className="h-6 w-6 text-muted-foreground" />
+            </div>
+            <h2 className="text-xl font-semibold mb-2">
+              No revision miniTopics yet
+            </h2>
+            <p className="text-muted-foreground mb-4">
+              Start adding miniTopics to review and they will appear here.
+            </p>
+          </Card>
+        ) : (
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {subTopicRevision.map((item, index) => (
+              <Card
+                key={index}
+                className="overflow-hidden transition-all hover:shadow-md"
+              >
+                <CardHeader className="pb-2">
+                  <div className="flex justify-between items-start mb-1">
+                    <Badge className={`${getCategoryColor(item.category)}`}>
+                      <Tag className="h-3.5 w-3.5 mr-1" />
+                      {item.category}
+                    </Badge>
+                    <div className="text-sm text-muted-foreground flex items-center">
+                      <Calendar className="h-3.5 w-3.5 mr-1" />
+                      {formatDate(item.reviewDate)}
+                    </div>
+                  </div>
+                  <CardTitle className="line-clamp-1 text-lg">
+                    {item.miniTopic}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="pb-2">
+                  <p className="text-muted-foreground line-clamp-2 text-sm">
+                    {item.notes || "No notes available"}
+                  </p>
+                </CardContent>
+                <CardFooter className="pt-2">
+                  <Button
+                    onClick={() => {
+                      isSubTopic(item.id);
+                      setReviewId(item.test);
+                    }}
+                    className="w-full"
+                    size="sm"
+                  >
+                    <BookOpen className="h-4 w-4 mr-2" />
+                    Quick Review
+                  </Button>
+                </CardFooter>
+              </Card>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

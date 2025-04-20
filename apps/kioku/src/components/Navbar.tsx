@@ -9,11 +9,11 @@ import {
 } from "@clerk/nextjs";
 import { useEffect } from "react";
 import { signIn } from "@/app/actions/auth";
-import Image from "next/image";
-import logo from "../../public/logo.webp";
+import { usePathname } from "next/navigation";
 
 export default function Navbar() {
-  const { user } = useUser();
+  const { isSignedIn, user, isLoaded } = useUser();
+  const pathName = usePathname();
 
   useEffect(() => {
     const checkUser = async () => {
@@ -28,22 +28,60 @@ export default function Navbar() {
     checkUser();
   }, [user]);
 
-  return (
-    <div className="flex justify-between gap-2 ">
-      <h1 className="text-2xl p-1 font-sans font-bold">Kioko</h1>
-      <div className="flex p-1 flex-row justify-around gap-16">
-        <p>Product</p>
-        <p>How it works</p>
-        <p>Testimonials</p>
+  if (!isLoaded) {
+    return (
+      <div className="fixed top-0 left-0 w-full h-16 flex items-center justify-center bg-gray-900 bg-opacity-95 backdrop-blur-sm">
+        <div className="animate-pulse flex space-x-4">
+          <div className="h-3 w-24 bg-gray-600 rounded"></div>
+          <div className="h-3 w-24 bg-gray-600 rounded"></div>
+        </div>
       </div>
-      <div className="flex justify-between gap-3 px-4">
-        <SignedOut>
-          <SignInButton />
-          <SignUpButton />
-        </SignedOut>
-        <SignedIn>
-          <UserButton />
-        </SignedIn>
+    );
+  }
+
+
+  
+  return (
+    <div className="fixed top-0 left-0 w-full h-16  bg-opacity-90 backdrop-blur-sm text-white shadow-lg z-50">
+      <div className="max-w-7xl mx-auto h-full flex items-center justify-between px-4 md:px-8 lg:px-12">
+        <h1 className="text-4xl  md:text-3xl font-bold tracking-tight bg-gradient-to-r from-indigo-400 to-purple-500 bg-clip-text text-transparent">
+          Kioko
+        </h1>
+        
+        <div className="flex items-center gap-6">
+          {pathName === "/" && (
+            <div className="hidden md:flex items-center gap-8 text-base font-medium ">
+              <button className="hover:text-white  transition-colors">Product</button>
+              <button className="hover:text-white  transition-colors">How it works</button>
+              <button className="hover:text-white  transition-colors">Testimonials</button>
+            </div>
+          )}
+          
+          <div className="flex items-center gap-3">
+            <SignedOut>
+              <SignInButton mode="modal">
+                <button className="px-4 py-2 text-sm text-white hover:text-indigo-200 transition-colors">
+                  Sign in
+                </button>
+              </SignInButton>
+              <SignUpButton mode="modal">
+                <button className="px-4 py-2 text-sm bg-indigo-600 hover:bg-indigo-700 text-white rounded-md transition-colors">
+                  Sign up
+                </button>
+              </SignUpButton>
+            </SignedOut>
+            
+            <SignedIn>
+              <UserButton 
+                appearance={{
+                  elements: {
+                    userButtonAvatarBox: "w-9 h-9 border-2 border-indigo-400"
+                  }
+                }} 
+              />
+            </SignedIn>
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -67,6 +67,59 @@ NO markdown formatting, ONLY valid JSON.`,
   }
 }
 
+
+
+export async function subTopicTestGeneration(prompt: string) {
+  try {
+    const response = await ai.models.generateContent({
+      model: "gemini-2.0-flash",
+      contents: [
+        {
+          role: "user",
+          parts: [{ text: prompt }],
+        },
+      ],
+      config: {
+        systemInstruction: {
+          parts: [
+            {
+              text: `You are an expert content analyzer. For provided text:
+1. Identify subTopic i given and extract subtopics content from notes 
+2. For  subtopic, generate:
+   -   relevant questions
+   - Clear correct answers
+   - Helpful hints
+3. Return as JSON with this exact structure:
+${JSON.stringify({
+  subtopics: [
+    {
+      name: "Subtopic Name",
+      questions: [
+        {
+          question: "Question text",
+          answer: "Correct answer",
+          hint: "Hint text",
+        },
+      ],
+    },
+  ],
+})}
+NO markdown formatting, ONLY valid JSON.`,
+            },
+          ],
+        },
+      },
+    });
+
+    // Extract and parse JSON from response
+    const cleanJson = response && response?.text?.replace(/```json|```/g, "");
+    return cleanJson;
+  } catch (error) {
+    console.error("Generation failed:", error);
+    throw new Error("Content generation failed. Please try again.");
+  }
+}
+
 export async function resultGenerateModel(prompt: string) {
   const response = await ai.models.generateContent({
     model: "gemini-2.0-flash",

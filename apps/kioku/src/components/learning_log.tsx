@@ -10,20 +10,20 @@ export default function New_Learning_Log() {
   const [category, setCategory] = useState("");
   const [notes, setNotes] = useState("");
   const { user } = useUser();
-  
+
   const date = new Date().toISOString();
-  
+
   async function onSubmit() {
     const res = await newLearningLogs({
       topic,
       category,
       notes,
-      date: date,
-      user: user?.id,
+      date,
+      user: user?.id || "",
     });
     console.log(res);
   }
-  
+
   return (
     <div className="flex flex-col gap-4 p-4">
       <div className="space-y-2">

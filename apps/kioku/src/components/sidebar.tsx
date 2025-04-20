@@ -47,14 +47,6 @@ export function SidebarLayout() {
               ))}
             </div>
           </div>
-          <div>
-            <SidebarLink
-              link={{
-                label: "Manu Arora",
-                href: "#",
-              }}
-            />
-          </div>
         </SidebarBody>
       </Sidebar>
     </div>

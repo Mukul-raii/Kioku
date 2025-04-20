@@ -32,8 +32,8 @@ export const getAllRevision = async (
           some: {
             testResult: {
               some: {
-                lastScore: {
-                  lte: 3,
+                currentInterval: {
+                  lte: 1,
                 },
               },
             },
@@ -49,6 +49,7 @@ export const getAllRevision = async (
       },
     });
 
+    
     res.status(200).json({
       message: "Revision Fetched Successfully",
       topics,

@@ -14,6 +14,7 @@ import {
   check_test_result,
   get_a_test,
   get_a_test_result,
+  get_a_test_result_sub_topic,
 } from "@/app/actions/learning-log";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -50,12 +51,14 @@ export default function QuickReview() {
   const [answer, setAnswer] = useState("");
   const [testResult, setTestResult] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubtopic, setISSubTopic] = useState(0);
+
 
   useEffect(() => {
     if (logReview === null) return;
     async function getTestData() {
       try {
-        const res = await get_a_test(logReview);
+        const res = await get_a_test(logReview, isSubtopic);
         const data = JSON.parse(res);
 
         setAllQuestions(
@@ -79,9 +82,19 @@ export default function QuickReview() {
   const totalQuestions = allQuestions?.length || 0;
 
   async function getResult() {
-    const res = await get_a_test_result(logReview, allAnswers);
-    console.log(res);
+   
+    if(isSubtopic === 0 ){
+      const res = await get_a_test_result(logReview, allAnswers);
+      console.log(res);
+  
+    }else{
+      const res = await get_a_test_result_sub_topic(logReview, allAnswers);
+      console.log(res);
+    }
   }
+ 
+
+
 
   async function checkTheAnswer() {
     if (!answer.trim()) return;
@@ -105,8 +118,8 @@ export default function QuickReview() {
   }
 
   function handleNextQuestion() {
-    console.log({currentIndex,totalQuestions});
-    
+    console.log({ currentIndex, totalQuestions });
+
     if (currentIndex <= totalQuestions - 1) {
       setAllAnswers((prevAnswers) => [
         ...prevAnswers,
@@ -126,7 +139,7 @@ export default function QuickReview() {
       setCheckResultDialogOpen(false);
     }
     if (currentIndex > totalQuestions - 1) {
-      const res =  getResult()
+      const res = getResult();
     }
   }
 
@@ -153,7 +166,7 @@ export default function QuickReview() {
 
   return (
     <div className="container mx-auto py-8 px-4">
-      <ReviewList reviewToLog={setLogReview} />
+      <ReviewList reviewToLog={setLogReview} isSubTopic={setISSubTopic} />
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="sm:max-w-2xl">
@@ -229,14 +242,14 @@ export default function QuickReview() {
                 </Button>
                 {
                   <Button
-                  variant="outline"
-                  onClick={() => getResult()}
-                  disabled={showHint}
-                  className="flex gap-2"
-                >
-                  <HelpCircle className="h-4 w-4" />
-                  Submit Answer
-                </Button>
+                    variant="outline"
+                    onClick={() => getResult()}
+                    disabled={showHint}
+                    className="flex gap-2"
+                  >
+                    <HelpCircle className="h-4 w-4" />
+                    Submit Answer
+                  </Button>
                 }
               </div>
 
@@ -305,26 +318,28 @@ export default function QuickReview() {
                 </div>
               </div>
 
-              <div className="space-y-3">
-                <p className="font-medium">How well did you know this?</p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  {Object.entries(rateYourSelf).map(([key, value]) => (
-                    <div key={key} className="flex items-center space-x-2">
-                      <Checkbox
-                        id={`rate-${key}`}
-                        checked={answerRating === key}
-                        onCheckedChange={() => setAnswerRating(key)}
-                      />
-                      <label
-                        htmlFor={`rate-${key}`}
-                        className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                      >
-                        {value}
-                      </label>
-                    </div>
-                  ))}
+              {checkResultData?.rate >= 2 && (
+                <div className="space-y-3">
+                  <p className="font-medium">How well did you know this?</p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {Object.entries(rateYourSelf).map(([key, value]) => (
+                      <div key={key} className="flex items-center space-x-2">
+                        <Checkbox
+                          id={`rate-${key}`}
+                          checked={answerRating === key}
+                          onCheckedChange={() => setAnswerRating(key)}
+                        />
+                        <label
+                          htmlFor={`rate-${key}`}
+                          className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                        >
+                          {value}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
 
             <DialogFooter className="flex gap-2 sm:gap-0">

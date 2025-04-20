@@ -21,3 +21,12 @@ export interface User {
     rating: number
   }
   
+
+
+  export interface New_Learning_Log{
+    topic:string,
+    category:string,
+    notes:string,
+    date:Date,
+    user:string,
+  }
