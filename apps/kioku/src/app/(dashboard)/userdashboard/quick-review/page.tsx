@@ -35,6 +35,8 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Answered } from "@repo/types";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import TailwindAdvancedEditor from "@/components/textEditor";
 
 export default function QuickReview() {
   const [logReview, setLogReview] = useState(null);
@@ -52,7 +54,17 @@ export default function QuickReview() {
   const [testResult, setTestResult] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubtopic, setISSubTopic] = useState(0);
+  const [showNotesId, setShowNotesId] = useState<string | null>(null);
+  const [isNotesOpen, setIsNotesOpen] = useState(false);
 
+  const handleShowNotes = (notes: string | null) => {
+    setShowNotesId(notes);
+    setIsNotesOpen(true);
+  };
+
+  useEffect(() => {
+    console.log("set show notes of this id ", showNotesId);
+  }, [showNotesId]);
 
   useEffect(() => {
     if (logReview === null) return;
@@ -69,6 +81,7 @@ export default function QuickReview() {
             }))
           )
         );
+
         setTestData(data);
         setDialogOpen(true);
       } catch (error) {
@@ -82,19 +95,16 @@ export default function QuickReview() {
   const totalQuestions = allQuestions?.length || 0;
 
   async function getResult() {
-   
-    if(isSubtopic === 0 ){
+    if (isSubtopic === 0) {
       const res = await get_a_test_result(logReview, allAnswers);
       console.log(res);
-  
-    }else{
-      const res = await get_a_test_result_sub_topic(logReview, allAnswers);
+    } else {
+      console.log(logReview, allAnswers);
+
+      const res = await get_a_test_result_sub_topic(isSubtopic, allAnswers);
       console.log(res);
     }
   }
- 
-
-
 
   async function checkTheAnswer() {
     if (!answer.trim()) return;
@@ -166,7 +176,11 @@ export default function QuickReview() {
 
   return (
     <div className="container mx-auto py-8 px-4">
-      <ReviewList reviewToLog={setLogReview} isSubTopic={setISSubTopic} />
+      <ReviewList
+        reviewToLog={setLogReview}
+        isSubTopic={setISSubTopic}
+        showNotes={handleShowNotes}
+      />
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="sm:max-w-2xl">
@@ -363,6 +377,45 @@ export default function QuickReview() {
           </DialogContent>
         </Dialog>
       ) : null}
+
+      {showNotesId !== null && (
+        <Dialog
+          open={isNotesOpen}
+          onOpenChange={(open) => {
+            setIsNotesOpen(open);
+            if (!open) setShowNotesId(null);
+          }}
+        >
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Notes</DialogTitle>
+            </DialogHeader>
+            <DialogDescription>
+              Here are the notes for this question:
+            </DialogDescription>
+            <ScrollArea className="h-64 w-full">
+              <TailwindAdvancedEditor
+                value={showNotesId}
+                onChange={(e) => {
+                  console.log("changed", e);
+                }}
+              />
+            </ScrollArea>
+            <DialogFooter>
+              <Button
+                onClick={() => {
+                  setIsNotesOpen(false);
+                  setShowNotesId(null);
+                  const content =
+                    window.localStorage.removeItem("novel-content");
+                }}
+              >
+                Close
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 }

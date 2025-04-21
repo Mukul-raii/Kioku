@@ -247,23 +247,6 @@ export const generate_a_Result_New_Topic = async (
     }, {})
   );
 
-  const lastTestResult = await prisma.testResults.findFirst({
-    where: {
-      id: id,
-    },
-    orderBy: {
-      createdDate: "desc",
-    },
-  });
-
-  function calculateInterval(rating, totalNumber) {
-    const ratingAvg = rating / totalNumber;
-    let interval;
-    if (ratingAvg >= 3) {
-      interval = 1;
-    }
-  }
-
   try {
     const reviewGenerate = await prisma.review.create({
       data: {
@@ -302,30 +285,47 @@ export const generate_a_Result_Sub_Topic = async (
   const ratedResults = result.filter((item) => item.rating !== null);
 
   const total = ratedResults.reduce((sum, item) => sum + item.rating, 0);
-  const ratingAvg = ratedResults.length > 0 ? total / ratedResults.length : 0;
+  const ratingAvg: number =
+    ratedResults.length > 0 ? total / ratedResults.length : 0;
 
-  function calculateInterval(rating, totalNumber) {
-    const ratingAvg = rating / totalNumber;
+  const previoustest = await prisma.testResults.findFirst({
+    where: {
+      id
+    },
+  });
+console.log(id,previoustest);
+
+  function calculateInterval() {
     let interval;
+    let EF = previoustest?.EF || 2.5;
     if (ratingAvg >= 3) {
-      interval = 1;
+      if (previoustest?.RepetitionCount == 1) interval = 2;
+      else if (previoustest?.RepetitionCount == 2) interval = 6;
+      else interval = previoustest?.currentInterval || 1 * EF;
+      EF = EF + (0.1 - (5 - ratingAvg) * (0.08 + (5 - ratingAvg) * 0.02));
+      EF = Math.max(EF, 1.3);
     }
+    return { interval, EF };
   }
+
+  const { interval, EF } = calculateInterval();
 
   try {
     const reviewGenerate = await prisma.testResults.update({
       where: {
-        id,
+        id: id,
       },
       data: {
         lastScore: ratingAvg,
-        currentInterval: 1, // interval is days until next review
-        RepetitionCount: ratingAvg >= 3 ? 1 : 0, // repetition count is how many successful reviews you had
+        EF: EF,
+        currentInterval: interval, // interval is days until next review
+        RepetitionCount: previoustest?.RepetitionCount, // repetition count is how many successful reviews you had
         nextReviewDate: new Date(
-          new Date().setDate(new Date().getDate() + 1)
+          new Date().setDate(new Date().getDate() + interval)
         ),
       },
     });
+    console.log(reviewGenerate);
 
     res.status(400).json({
       message: "Result Generated Successfully",

@@ -24,6 +24,12 @@ export const getAllRevision = async (
         },
       },
     });
+const todaydate = new Date()
+    const startOfDay = new Date(todaydate);
+    startOfDay.setHours(0, 0, 0, 0);
+    
+    const endOfDay = new Date(todaydate);
+    endOfDay.setHours(23, 59, 59, 999);
 
     const miniTopics = await prisma.learningLog.findMany({
       where: {
@@ -32,8 +38,9 @@ export const getAllRevision = async (
           some: {
             testResult: {
               some: {
-                currentInterval: {
-                  lte: 1,
+                nextReviewDate: {
+                  gte: startOfDay,
+                  lte: endOfDay,
                 },
               },
             },

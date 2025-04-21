@@ -60,6 +60,7 @@ model TestResults {
   id              Int      @id @default(autoincrement())
   review          Review   @relation(fields: [reviewId], references: [id])
   reviewId        Int
+  EF              Float    @default(2.5)
   miniTopic       String
   lastScore       Int
   currentInterval Int

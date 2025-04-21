@@ -9,12 +9,12 @@ import {
 } from "@clerk/nextjs";
 import { useEffect } from "react";
 import { signIn } from "@/app/actions/auth";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 export default function Navbar() {
   const { isSignedIn, user, isLoaded } = useUser();
   const pathName = usePathname();
-
+  const router = useRouter();
   useEffect(() => {
     const checkUser = async () => {
       if (user) {
@@ -39,24 +39,31 @@ export default function Navbar() {
     );
   }
 
-
-  
   return (
     <div className="fixed top-0 left-0 w-full h-16  bg-opacity-90 backdrop-blur-sm text-white shadow-lg z-50">
       <div className="max-w-7xl mx-auto h-full flex items-center justify-between px-4 md:px-8 lg:px-12">
-        <h1 className="text-4xl  md:text-3xl font-bold tracking-tight bg-gradient-to-r from-indigo-400 to-purple-500 bg-clip-text text-transparent">
+        <h1
+          onClick={() => router.push("/")}
+          className="text-4xl  md:text-3xl font-bold tracking-tight bg-gradient-to-r from-indigo-400 to-purple-500 bg-clip-text text-transparent cursor-pointer"
+        >
           Kioko
         </h1>
-        
+
         <div className="flex items-center gap-6">
           {pathName === "/" && (
             <div className="hidden md:flex items-center gap-8 text-base font-medium ">
-              <button className="hover:text-white  transition-colors">Product</button>
-              <button className="hover:text-white  transition-colors">How it works</button>
-              <button className="hover:text-white  transition-colors">Testimonials</button>
+              <button className="hover:text-white  transition-colors">
+                Product
+              </button>
+              <button className="hover:text-white  transition-colors">
+                How it works
+              </button>
+              <button className="hover:text-white  transition-colors">
+                Testimonials
+              </button>
             </div>
           )}
-          
+
           <div className="flex items-center gap-3">
             <SignedOut>
               <SignInButton mode="modal">
@@ -70,16 +77,28 @@ export default function Navbar() {
                 </button>
               </SignUpButton>
             </SignedOut>
-            
-            <SignedIn>
-              <UserButton 
-                appearance={{
-                  elements: {
-                    userButtonAvatarBox: "w-9 h-9 border-2 border-indigo-400"
-                  }
-                }} 
-              />
-            </SignedIn>
+
+            {pathName === "/" ? (
+              <SignedIn>
+                <UserButton
+                  appearance={{
+                    elements: {
+                      userButtonAvatarBox: "w-9 h-9 border-2 border-indigo-400",
+                    },
+                  }}
+                />
+              </SignedIn>
+            ) : (
+              <SignedIn>
+                <UserButton
+                  appearance={{
+                    elements: {
+                      userButtonAvatarBox: "w-9 h-9 border-2 border-indigo-400",
+                    },
+                  }}
+                />
+              </SignedIn>
+            )}
           </div>
         </div>
       </div>

@@ -18,9 +18,11 @@ import { Skeleton } from "./ui/skeleton";
 export default function ReviewList({
   reviewToLog,
   isSubTopic,
+  showNotes,
 }: {
   reviewToLog: number;
   isSubTopic: number;
+  showNotes: (notes: string | null) => void;
 }) {
   const { user } = useUser();
   const [data, setData] = useState(null);
@@ -45,6 +47,8 @@ export default function ReviewList({
             }))
           )
         );
+        console.log(subtopic);
+
         setSubTopicRevision(subtopic[0]);
         console.log(subtopic);
       } catch (error) {
@@ -165,12 +169,15 @@ export default function ReviewList({
                 <CardTitle className="line-clamp-1 text-lg">
                   {item.topic}
                 </CardTitle>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => showNotes(item.notes)}
+                >
+                  Notes
+                </Button>
               </CardHeader>
-              <CardContent className="pb-2">
-                <p className="text-muted-foreground line-clamp-2 text-sm">
-                  {item.notes || "No notes available"}
-                </p>
-              </CardContent>
+
               <CardFooter className="pt-2">
                 <Button
                   onClick={() => setReviewId(item.id)}
@@ -231,11 +238,7 @@ export default function ReviewList({
                     {item.miniTopic}
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="pb-2">
-                  <p className="text-muted-foreground line-clamp-2 text-sm">
-                    {item.notes || "No notes available"}
-                  </p>
-                </CardContent>
+
                 <CardFooter className="pt-2">
                   <Button
                     onClick={() => {
