@@ -9,16 +9,15 @@ export default function UserDashboard() {
 
   return (
     <div>
-      <Card className="w-56 h-20 cursor-pointer">
+      <Card className="w-56 h-20 border-gray-700 cursor-pointer">
         <div
           className="flex flex-row items-center p-1 gap-3"
           onClick={() => setShowNoteModal(true)}
         >
           <Edit />
-          <p className="text-gray-500">New Learning Log</p>
+          <p className="text-gray-300">Start typing . . . . . . . .</p>
         </div>
       </Card>
-
       {showNoteModal && (
         <NoteTaking isOpen={true} onClose={() => setShowNoteModal(false)} />
       )}

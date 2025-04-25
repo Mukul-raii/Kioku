@@ -7,9 +7,13 @@ import {
   UserButton,
   useUser,
 } from "@clerk/nextjs";
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { signIn } from "@/app/actions/auth";
 import { usePathname, useRouter } from "next/navigation";
+import Link from "next/link";
+import { DotIcon } from "lucide-react";
+import { Button } from "./ui/button";
+import { ButtonColorful } from "./ui/button-colorful";
 
 export default function Navbar() {
   const { isSignedIn, user, isLoaded } = useUser();
@@ -17,9 +21,17 @@ export default function Navbar() {
   const router = useRouter();
   useEffect(() => {
     const checkUser = async () => {
+      if (!isSignedIn || !user) return;
+
       if (user) {
+        console.log(user);
         try {
-          const res = await signIn(user);
+          const res = await signIn({
+            email: user.primaryEmailAddress?.emailAddress ?? "",
+            imgUrl: user.imageUrl ?? "",
+            name: user.fullName ?? "",
+            userId: user.id,
+          });
         } catch (error) {
           console.error("Error checking user:", error);
         }
@@ -78,22 +90,19 @@ export default function Navbar() {
               </SignUpButton>
             </SignedOut>
 
-            {pathName === "/" ? (
-              <SignedIn>
-                <UserButton
-                  appearance={{
-                    elements: {
-                      userButtonAvatarBox: "w-9 h-9 border-2 border-indigo-400",
-                    },
-                  }}
-                />
-              </SignedIn>
+            {pathName === "/" && isSignedIn ? (
+                 <Link href="/userdashboard">
+                 <div className="flex cursor-pointer items-center gap-2">
+                   <ButtonColorful className="rounded-4xl cursor-pointer" label="Dashboard" />
+                 </div>
+               </Link>
+             
             ) : (
               <SignedIn>
                 <UserButton
                   appearance={{
                     elements: {
-                      userButtonAvatarBox: "w-9 h-9 border-2 border-indigo-400",
+                      userButtonAvatarBox: "w-12 h-12 ",
                     },
                   }}
                 />

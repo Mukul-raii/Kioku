@@ -1,3 +1,4 @@
+import { clerkClient } from "@clerk/express";
 import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
 const prisma = new PrismaClient();
@@ -24,10 +25,10 @@ export const getAllRevision = async (
         },
       },
     });
-const todaydate = new Date()
+    const todaydate = new Date();
     const startOfDay = new Date(todaydate);
     startOfDay.setHours(0, 0, 0, 0);
-    
+
     const endOfDay = new Date(todaydate);
     endOfDay.setHours(23, 59, 59, 999);
 
@@ -56,13 +57,83 @@ const todaydate = new Date()
       },
     });
 
-    
     res.status(200).json({
       message: "Revision Fetched Successfully",
       topics,
       miniTopics,
     });
   } catch (error) {
+    res.status(500).json({
+      message: "Server Not Responded",
+    });
+  }
+};
+
+export const getProgress = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  console.log("startin");
+
+  try {
+    const { userId } = req.query as { userId: string };
+    const userid = await clerkClient.users.getUser(userId?.toString() || " ");
+
+    const learningLogs = await prisma.learningLog.findMany({
+      where: {
+        userId: userId,
+      },
+      include: {
+        review: {
+          include: {
+            testResult: true,
+          },
+        },
+      },
+    });
+
+    const testResult = learningLogs.flatMap((review) =>
+      review.review.flatMap((item) =>
+        item.testResult.map((q) => ({
+          id: q.id,
+          lastScore: q.lastScore,
+          repetitionCount: q.RepetitionCount,
+          nextReviewDate: q.nextReviewDate,
+          miniTopic: q.miniTopic,
+          interval: q.currentInterval,
+          category: review.category,
+        }))
+      )
+    );
+    const today = new Date()
+
+      const reviewThisMonth = testResult.filter((item) =>{
+        const review = new Date(item.nextReviewDate)
+        console.log(today);
+        
+        return review.getMonth() === today.getMonth() && review.getFullYear() === today.getFullYear()
+      })
+      const totalScore=reviewThisMonth.reduce((acc,entry)=> acc+entry.lastScore,0)
+      const retention= reviewThisMonth.length > 0 
+        ? ( totalScore/reviewThisMonth.length).toFixed(2) 
+        :"No reviews this month"
+
+      const masteredTopics = testResult.filter((entry)=>entry.repetitionCount>=3 && entry.lastScore>=4)
+      const masteredTopicCount = masteredTopics.length;
+
+
+    res.status(200).json({
+      message: "Revision Fetched Successfully",
+        learningLogs:learningLogs,
+        reviewThisMonth,
+        totalScore,
+        retention,
+        masteredTopics,
+        masteredTopicCount
+    });
+  } catch (error) {
+    console.log(error);
+
     res.status(500).json({
       message: "Server Not Responded",
     });

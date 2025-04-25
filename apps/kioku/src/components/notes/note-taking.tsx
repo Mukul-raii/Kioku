@@ -51,6 +51,8 @@ export default function NoteTaking({ isOpen, onClose }) {
 
   const NoteForm = () => (
     <div className="space-y-6 ">
+     <div className=" flex flex-row gap-2">
+
       <div className="space-y-2">
         <div className="flex items-center">
           <BookOpen className="w-4 h-4 text-blue-500 mr-2" />
@@ -62,7 +64,7 @@ export default function NoteTaking({ isOpen, onClose }) {
           onChange={(e) => setTopic(e.target.value)}
           placeholder="What topic are you studying?"
           className="w-full focus:ring-2 focus:ring-blue-500"
-        />
+          />
       </div>
       
       <div className="space-y-2">
@@ -76,15 +78,16 @@ export default function NoteTaking({ isOpen, onClose }) {
           value={category}
           onChange={(e) => setCategory(e.target.value)}
           className="w-full focus:ring-2 focus:ring-green-500"
-        />
+          />
       </div>
       
+          </div>
       <div className="space-y-2">
         <div className="flex items-center">
           <CalendarDays className="w-4 h-4 text-purple-500 mr-2" />
           <Label className="font-medium text-white">Notes</Label>
         </div>
-          <ScrollArea className="h-64 w-full">
+          <ScrollArea className="h-full w-full">
             <TailwindAdvancedEditor value={notes} onChange={setNotes} />
           </ScrollArea>
       </div>
@@ -124,7 +127,7 @@ export default function NoteTaking({ isOpen, onClose }) {
   
   // For inline mode (used directly on a page)
   return (
-    <div className=" shadow-sm  p-6 mx-102">
+    <div className=" w-full shadow-sm  p-6 mx-102">
       <h2 className="text-xl font-semibold text-white mb-6">Add New Note</h2>
       <NoteForm />
     </div>

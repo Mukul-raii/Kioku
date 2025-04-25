@@ -63,10 +63,6 @@ export default function QuickReview() {
   };
 
   useEffect(() => {
-    console.log("set show notes of this id ", showNotesId);
-  }, [showNotesId]);
-
-  useEffect(() => {
     if (logReview === null) return;
     async function getTestData() {
       try {

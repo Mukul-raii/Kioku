@@ -65,11 +65,97 @@ export const createNewLearningLog = async (
   }
 };
 
+export const getLearningLogStats = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const { userId } = req.query as { userId: string };
+  console.log(userId);
+
+  try {
+    const learningLogs = await prisma.learningLog.findMany({
+      where: { userId },
+      include: {
+        review: {
+          include: {
+            testResult: {
+              orderBy: {
+                lastReviewed: "desc",
+              },
+            },
+          },
+        },
+      },
+    });
+console.log(JSON.stringify(learningLogs));
+
+    const learningLogsWithStats = learningLogs.map((learningLog) => {
+      const testResult = learningLog.review?.[0]?.testResult || []
+      console.log(testResult);
+
+      const lastScore = testResult.reduce(
+        (sum, result) => sum + result.lastScore,
+        0
+      );
+      const totalSubTopic = testResult.length;
+      const avgScore = lastScore / totalSubTopic;
+      const retention = (avgScore / 5) * 100;
+      return {
+        ...learningLog,
+        totalSubTopic: totalSubTopic,
+        retention: retention,
+      };
+    });
+
+    res.status(200).json({
+      message: "Learning Logs Fetched Successfully",
+      learningLogs,learningLogsWithStats
+    });
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      message: "Server Not Responded",
+    });
+  }
+};
+
+export const updateLearningLog = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const { logId } = req.params;
+  const { notes, topic, category } = req.body;
+  if (logId === undefined || null) {
+    res.status(404).json({
+      message: "Id is required",
+    });
+    return;
+  }
+
+  try {
+    const learningLog = await prisma.learningLog.update({
+      where: {
+        id: parseInt(logId),
+      },
+      data: {
+        category,
+        topic,
+        notes,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Server Not Responded",
+    });
+  }
+};
+
 export const getAllLearningLogs = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  const { userId } = req.query;
+  const { userId } = req.query as { userId: string };
 
   try {
     if (!userId) {
@@ -127,9 +213,7 @@ export const generate_a_Test = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  const id = req.query.id as string; //learning log id
-  const { isSubtopic } = req.body;
-  console.log(id, isSubtopic);
+  const { id, isSubtopic } = req.query as { id: string; isSubtopic: string }; //learning log id
 
   if (id === undefined || null) {
     res.status(400).json({
@@ -139,7 +223,7 @@ export const generate_a_Test = async (
   }
 
   try {
-    if (isSubtopic !== 0) {
+    if (parseInt(isSubtopic) !== 0) {
       const learningLog = await prisma.learningLog.findMany({
         where: {
           id: parseInt(id),
@@ -149,7 +233,7 @@ export const generate_a_Test = async (
             include: {
               testResult: {
                 where: {
-                  id: isSubtopic,
+                  id: parseInt(isSubtopic),
                 },
               },
             },
@@ -290,10 +374,10 @@ export const generate_a_Result_Sub_Topic = async (
 
   const previoustest = await prisma.testResults.findFirst({
     where: {
-      id
+      id,
     },
   });
-console.log(id,previoustest);
+  console.log(id, previoustest);
 
   function calculateInterval() {
     let interval;
