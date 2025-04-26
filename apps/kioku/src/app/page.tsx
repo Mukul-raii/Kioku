@@ -1,22 +1,12 @@
-"use client";
+'use client';
 import Experience from "@/components/experience";
-import { Squares } from "@/components/ui/squares-background";
+import { SquareHome } from "@/components/SquareHome";
 import { motion } from "framer-motion";
 
 export default function Home() {
   return (
     <div className="min-h-screen w-full bg-slate-950 relative ">
-      <div className="fixed inset-0 w-full h-full">
-        <Squares
-          direction="down"
-          speed={0.5}
-          squareSize={90}
-          borderColor="#333"
-          hoverFillColor="#222"
-        />
-      </div>
-
-
+      <SquareHome />
       <div className="relative z-10 max-w-7xl mx-auto h-screen flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

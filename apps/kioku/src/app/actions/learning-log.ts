@@ -1,29 +1,10 @@
 "use server";
-import { New_Learning_Log } from "@repo/types";
+import { LearningLogsResponse, New_Learning_Log } from "@repo/types";
 import axios from "axios";
 import { auth } from "@clerk/nextjs/server";
 
-export const getAllLearningLogs = async (userId: string) => {
-  const { getToken } = await auth();
-  const token = await getToken();
-  const response = await axios.get(
-    `${process.env.NEXT_PUBLIC_BACKEND_API}/learningLog`,
-    {
-      params: {
-        userId,
-      },
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
-  return response.data;
-};
 
-
-
-
-export const get_all_learning_Log_stats = async () => {
+export const get_all_learning_Log_stats = async ():Promise<LearningLogsResponse> => {
   const { userId, getToken } = await auth();
   const token = await getToken();
 console.log(token,userId);
@@ -39,9 +20,6 @@ console.log(token,userId);
       },
     }
   );
-  
-
-    console.log(response);
     return response.data;
 
 };
