@@ -4,6 +4,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { Inter } from "next/font/google";
 import Navbar from "@/components/Navbar";
 import { ThemeProvider } from "@/components/theme-provider";
+import { Profiler } from "react";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -11,6 +12,12 @@ export const metadata: Metadata = {
 };
 
 const inter = Inter({ subsets: ["latin"] });
+
+function onRender(id, phase, actualDuration, baseDuration, startTime, commitTime) {
+  // Aggregate or log render timings...
+  console.log({id, phase, actualDuration, baseDuration, startTime, commitTime});
+  
+}
 
 export default function RootLayout({
   children,

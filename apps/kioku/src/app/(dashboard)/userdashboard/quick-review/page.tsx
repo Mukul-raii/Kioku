@@ -1,6 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
-import ReviewList from "@/components/review";
+import { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -37,6 +36,7 @@ import { cn } from "@/lib/utils";
 import { Answered } from "@repo/types";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import TailwindAdvancedEditor from "@/components/textEditor";
+import { ReviewList } from "@/components/quickreview/review";
 
 export default function QuickReview() {
   const [logReview, setLogReview] = useState(null);
@@ -57,33 +57,41 @@ export default function QuickReview() {
   const [showNotesId, setShowNotesId] = useState<string | null>(null);
   const [isNotesOpen, setIsNotesOpen] = useState(false);
 
-  const handleShowNotes = (notes: string | null) => {
+  const handleShowNotes = useCallback((notes: string | null) => {
     setShowNotesId(notes);
     setIsNotesOpen(true);
-  };
+  },[]);
+  const setLogReviewCallback = useCallback((value) => {
+    setLogReview(value);
+  }, []);
+  
+  const setISSubTopicCallback = useCallback((value) => {
+    setISSubTopic(value);
+  }, []);
+
+  async function getTestData() {
+    try {
+      const res = await get_a_test(logReview, isSubtopic);
+      const data = JSON.parse(res);
+
+      setAllQuestions(
+        data?.subtopics?.flatMap((sub) =>
+          sub.questions.map((q) => ({
+            ...q,
+            subTopic: sub.name,
+          }))
+        )
+      );
+
+      setTestData(data);
+      setDialogOpen(true);
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
   useEffect(() => {
     if (logReview === null) return;
-    async function getTestData() {
-      try {
-        const res = await get_a_test(logReview, isSubtopic);
-        const data = JSON.parse(res);
-
-        setAllQuestions(
-          data?.subtopics?.flatMap((sub) =>
-            sub.questions.map((q) => ({
-              ...q,
-              subTopic: sub.name,
-            }))
-          )
-        );
-
-        setTestData(data);
-        setDialogOpen(true);
-      } catch (error) {
-        console.error(error);
-      }
-    }
     getTestData();
   }, [logReview]);
 
@@ -169,12 +177,14 @@ export default function QuickReview() {
     if (rate === 2) return <AlertCircle className="h-5 w-5 text-amber-600" />;
     return <XCircle className="h-5 w-5 text-red-600" />;
   }
+  console.log("review page rendered");
 
   return (
     <div className="container mx-auto py-8 px-4">
+      {/* List the review Card .... */}
       <ReviewList
-        reviewToLog={setLogReview}
-        isSubTopic={setISSubTopic}
+        reviewToLog={setLogReviewCallback}
+        isSubTopic={setISSubTopicCallback}
         showNotes={handleShowNotes}
       />
 
