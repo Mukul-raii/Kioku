@@ -1,12 +1,12 @@
 "use server"
 import axios from "axios";
 import { auth } from "@clerk/nextjs/server";
+import { GroupedNotes } from "@repo/types";
 
 
-export const getAllRevision = async (userId: string) => {
+export const getAllRevision = async (userId: string): Promise<GroupedNotes> => {
   const { getToken } = await auth();
   const token = await getToken();
-
 
 
   const response = await axios.post(
@@ -18,7 +18,6 @@ export const getAllRevision = async (userId: string) => {
       },
     }
   );
-  console.log(response);
 
   return response.data;
 };

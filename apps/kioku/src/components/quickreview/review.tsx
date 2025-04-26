@@ -1,7 +1,7 @@
 "use client";
 import { getAllRevision } from "@/app/actions/quick-review";
 import { useUser } from "@clerk/nextjs";
-import { memo, useEffect, useState } from "react";
+import { memo, useCallback, useEffect, useState } from "react";
 import { Clock, Brain } from "lucide-react";
 import { Badge } from "../ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
@@ -14,6 +14,11 @@ import {
 } from "@/components/ui/select";
 import { ReviewListLoader } from "./reviewLIstLoader";
 import { ReviewCard, NoDataCard } from "./reviewCard";
+import {
+  GroupedNotes,
+  SubTopicAggregate,
+  TopicsForRevision,
+} from "@repo/types";
 
 export const ReviewList = memo(function ReviewList({
   reviewToLog,
@@ -21,43 +26,52 @@ export const ReviewList = memo(function ReviewList({
   showNotes,
 }: any) {
   const { user } = useUser();
-  const [data, setData] = useState(null);
+  const [data, setData] = useState<GroupedNotes>({
+    message: "",
+    topics: [],
+    miniTopics: [],
+  });
   const [loading, setLoading] = useState(true);
-  const [subTopicRevision, setSubTopicRevision] = useState(null);
+  const [subTopicRevision, setSubTopicRevision] = useState<SubTopicAggregate[]>(
+    []
+  );
   const [activeTab, setActiveTab] = useState("topics");
   const [filterCategory, setFilterCategory] = useState("all");
   console.log("review list rendered");
 
   useEffect(() => {
-    let isMounted = true;
-    if (!user) return ;
+    const isMounted = true;
+    if (!user) return;
 
     async function fetchData() {
       try {
         setLoading(true);
         const res = await getAllRevision(user?.id || "");
-        console.log(res);
-        
-        setData(res);
+        if (isMounted) setData(res);
 
-        const subtopic = res?.miniTopics.flatMap((subtopi) =>
-          subtopi.review.map((test) =>
-            test.testResult.map((q) => ({
-              test: test.logId,
-              category: subtopi.category,
-              id: q.id,
-              miniTopic: q.miniTopic,
-              lastScore: q.lastScore,
-              reviewDate: q.nextReviewDate,
-            }))
-          )
+        const subtopic: SubTopicAggregate[] = res.miniTopics.flatMap(
+          (subitem) =>
+            // For each miniTopic, either flatten or return an empty array
+            subitem.review?.flatMap((test) =>
+               test.testResult?.map((q) => ({
+                test: test.logId,
+                category: subitem.category,
+                id: q.id,
+                miniTopic: q.miniTopic,
+                lastScore: q.lastScore,
+                reviewDate: q.nextReviewDate,
+              }))
+            ) ?? []
         );
 
-        setSubTopicRevision(subtopic[0]);
+        setSubTopicRevision(subtopic);
       } catch (error) {
         console.error("Error fetching revision data:", error);
       } finally {
         setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     }
 
@@ -67,26 +81,32 @@ export const ReviewList = memo(function ReviewList({
   }, [user]);
 
   // Filter categories function
-  const filterItems = (items, category) => {
-    if (!items) return [];
-    if (category === "all") return items;
-    return items.filter((item) => item.category === category);
-  };
+  const filterItems = useCallback(
+    <T extends { category: string }>(
+      items: T[] | undefined,
+      category: string
+    ): T[] => {
+      if (!items) return [];
+      if (category === "all") return items;
+      return items.filter((item) => item.category === category);
+    },
+    []
+  );
 
   // Get unique categories from data
-  const getUniqueCategories = () => {
-    const categories = new Set();
+  const getUniqueCategories = useCallback(() => {
+    const categories = new Set<string>();
 
     if (data?.topics) {
       data.topics.forEach((item) => categories.add(item.category));
     }
 
     if (subTopicRevision) {
-      subTopicRevision.forEach((item) => categories.add(item.category));
+      subTopicRevision?.forEach((item) => categories.add(item.category));
     }
 
     return Array.from(categories);
-  };
+  }, [data?.topics, subTopicRevision]);
 
   if (loading) {
     return <ReviewListLoader />;
@@ -112,8 +132,8 @@ export const ReviewList = memo(function ReviewList({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Categories</SelectItem>
-              {getUniqueCategories().map((category) => (
-                <SelectItem key={category} value={category}>
+              {getUniqueCategories().map((category: string, index: number) => (
+                <SelectItem key={index} value={category}>
                   {category}
                 </SelectItem>
               ))}
@@ -152,14 +172,16 @@ export const ReviewList = memo(function ReviewList({
             />
           ) : (
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {filterItems(data.topics, filterCategory).map((item, index) => (
-                <ReviewCard
-                  key={index}
-                  item={item}
-                  setReview={reviewToLog}
-                  setNotesId={showNotes}
-                />
-              ))}
+              {filterItems(data.topics, filterCategory).map(
+                (item: TopicsForRevision) => (
+                  <ReviewCard
+                    key={item.id}
+                    item={item}
+                    setReview={reviewToLog}
+                    setNotesId={showNotes}
+                  />
+                )
+              )}
             </div>
           )}
         </TabsContent>
@@ -173,9 +195,9 @@ export const ReviewList = memo(function ReviewList({
           ) : (
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {filterItems(subTopicRevision, filterCategory).map(
-                (item, index) => (
+                (item: SubTopicAggregate, index: number) => (
                   <ReviewCard
-                    key={index}
+                    key={item.id}
                     item={item}
                     setReview={reviewToLog}
                     setNotesId={showNotes}

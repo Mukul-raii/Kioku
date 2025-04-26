@@ -10,18 +10,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Grid2X2Icon, Grid3X3Icon, List, Search, Table } from "lucide-react";
+import { LearningLogWithStats, MiniTopicForRevision } from "@repo/types";
+import {  Grid3X3Icon, List } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export default function MyNote() {
   const [isTable, setIsTable] = useState(true);
-  const [data ,setData] = useState<any>([]);
+  const [data ,setData] = useState<LearningLogWithStats[]>([]);
+
   useEffect(() => {
     async function fetchData() {
       try {
-        const res = await get_all_learning_Log_stats();
-        console.log("page data", res);
-        setData(res.learningLogsWithStats);
+        const res = await get_all_learning_Log_stats()
+        setData(res.learningLogsWithStats)
+        
       } catch (error) {
         console.log(error);
       }

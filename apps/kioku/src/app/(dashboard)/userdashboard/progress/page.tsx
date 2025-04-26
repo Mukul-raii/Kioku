@@ -2,7 +2,7 @@
 import { getProgress } from "@/app/actions/quick-review";
 import ProcessPageView from "@/components/ProcessPageView";
 import { useUser } from "@clerk/nextjs";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 export default function ProgressPage() {
   const { user } = useUser();
@@ -14,15 +14,20 @@ export default function ProgressPage() {
   const [masteredTopicCount, setMasteredTopicCount] = useState(0);
 
   useEffect(() => {
+    if (!user.id) return;
+
     async function fetchData() {
       try {
-        const res = await getProgress(user?.id);
+        const res = await getProgress(user.id);
+        console.log(res);
       } catch (error) {
         console.log(error);
       }
     }
+
     fetchData();
-  }, []);
+  }, [user , user.id]); 
+
 
   return (
     <div className="flex flex-col gap-6 mx-5 my-10">

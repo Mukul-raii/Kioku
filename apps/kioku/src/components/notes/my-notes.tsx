@@ -28,20 +28,21 @@ import {
 } from "../ui/dialog";
 import { ScrollArea } from "../ui/scroll-area";
 import TailwindAdvancedEditor from "../textEditor";
+import { LearningLogWithStats } from "@repo/types";
 
 export default function MyNotes({
   isTable,
   Data,
 }: {
   isTable: boolean;
-  Data: any;
+  Data: LearningLogWithStats[];
 }) {
-  const [hoveredCard, setHoveredCard] = useState(null);
+  const [hoveredCard, setHoveredCard] = useState<number | null>(null);
   const [isNotesOpen, setIsNotesOpen] = useState(false);
-  const [showNotesId, setShowNotesId] = useState("");
-
-  const getRetentionColor = (retention) => {
-    const retentionValue = parseInt(retention) || 0;
+  const [showNotesData,setShowNotesData ] = useState<string | null>(null);
+  
+  const getRetentionColor = (retention:number) => {
+    const retentionValue = retention || 0;
     if (retentionValue >= 80) return "text-green-500";
     if (retentionValue >= 50) return "text-yellow-500";
     return "text-red-500";
@@ -74,7 +75,7 @@ export default function MyNotes({
             <TableBody>
               {Data &&
                 Data.map((item) => {
-                  const retentionClass = getRetentionColor(item.retention);
+                  const retentionClass = getRetentionColor(item.retention ?? 0);
                   return (
                     <TableRow
                       key={item.id}
@@ -107,7 +108,7 @@ export default function MyNotes({
                           size="sm"
                           className="hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-900 dark:hover:text-blue-300"
                           onClick={() => {
-                            setShowNotesId(item.notes);
+                            setShowNotesData(item.notes);
                             setIsNotesOpen(true);
                           }}
                         >
@@ -167,9 +168,9 @@ export default function MyNotes({
                         </p>
                         <span
                           className={`${
-                            parseInt(retentionValue) >= 80
+                            retentionValue >= 80
                               ? "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200"
-                              : parseInt(retentionValue) >= 50
+                              : retentionValue >= 50
                                 ? "bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200"
                                 : "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200"
                           } px-2 py-1 rounded-md text-sm font-medium`}
@@ -184,7 +185,7 @@ export default function MyNotes({
                       variant="outline"
                       className="w-full gap-2 hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-900 dark:hover:text-blue-300 transition-colors"
                       onClick={() => {
-                        setShowNotesId(item.notes);
+                        setShowNotesData(item.notes);
                         setIsNotesOpen(true);
                       }}
                     >
@@ -198,12 +199,12 @@ export default function MyNotes({
         </div>
       )}
 
-      {showNotesId !== null && (
+      {showNotesData !== null && (
         <Dialog
           open={isNotesOpen}
           onOpenChange={(open) => {
             setIsNotesOpen(open);
-            if (!open) setShowNotesId(null);
+            if (!open) setShowNotesData(null);
           }}
         >
           <DialogContent>
@@ -215,19 +216,16 @@ export default function MyNotes({
             </DialogDescription>
             <ScrollArea className="h-64 w-full">
               <TailwindAdvancedEditor
-                value={showNotesId}
-                onChange={(e) => {
-                  console.log("changed", e);
-                }}
+                value={showNotesData}
+                onChange={() => {}}
               />
             </ScrollArea>
             <DialogFooter>
               <Button
                 onClick={() => {
                   setIsNotesOpen(false);
-                  setShowNotesId(null);
-                  const content =
-                    window.localStorage.removeItem("novel-content");
+                  setShowNotesData(null);
+                  window.localStorage.removeItem("novel-content");
                 }}
               >
                 Close
