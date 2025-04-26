@@ -18,7 +18,7 @@ export default function DashboardLayout({
         )}
       >
         <div className="relative z-10 w-full h-full flex flex-row">
-          <SidebarLayout />z
+          <SidebarLayout />
           <main className="flex-1 overflow-auto">{children}</main>
         </div>
       </div>

@@ -14,8 +14,6 @@ export interface Red {
   email: string;
 }
 
-w;
-
 export type Answered = {
   question: string;
   answer: string;
