@@ -3,26 +3,25 @@ import { LearningLogsResponse, New_Learning_Log } from "@repo/types";
 import axios from "axios";
 import { auth } from "@clerk/nextjs/server";
 
+export const get_all_learning_Log_stats =
+  async (user:any): Promise<LearningLogsResponse> => {
+    const { userId, getToken } = await auth();
+    const token = await getToken();
+    
 
-export const get_all_learning_Log_stats = async ():Promise<LearningLogsResponse> => {
-  const { userId, getToken } = await auth();
-  const token = await getToken();
-console.log(token,userId);
-
-  const response = await axios.get(
-    `${process.env.NEXT_PUBLIC_BACKEND_API}/learningLog/get_all_learning_Log_stats`,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      params: {
-        userId,
-      },
-    }
-  );
+    const response = await axios.get(
+      `${process.env.NEXT_PUBLIC_BACKEND_API}/learningLog/get_all_learning_Log_stats`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        params: {
+          userId,
+        },
+      }
+    );
     return response.data;
-
-};
+  };
 
 export const newLearningLogs = async (data: New_Learning_Log) => {
   const { getToken } = await auth();
@@ -65,16 +64,20 @@ export const check_test_result = async ({
 export const get_a_test = async (id: number, isSubtopic: number) => {
   const { getToken } = await auth();
   const token = await getToken();
+
   const response = await axios.post(
     `${process.env.NEXT_PUBLIC_BACKEND_API}/learningLog/get_a_test`,
+    {},
     {
       params: {
-        id,
-        isSubTopic: isSubtopic.toString(),
+        id: id,
+        isSubTopic: isSubtopic,
       },
       headers: { Authorization: `Bearer ${token}` },
     }
   );
+  console.log(response);
+
   return response.data.test;
 };
 

@@ -6,6 +6,7 @@ import User from "./routes/user";
 import LearningLog from "./routes/learningLog";
 import Review from "./routes/review";
 import { clerkMiddleware, getAuth, requireAuth } from "@clerk/express";
+import { errrorHandler } from "./libs/asyncHandler";
 const app = express();
 
 app.use(
@@ -16,7 +17,7 @@ app.use(
   })
 );
 app.use(clerkMiddleware())
-
+app.use(errrorHandler)
 app.use(bodyParser.json({ limit: "10mb" }));
 app.use(bodyParser.urlencoded({ limit: "10mb", extended: true }));
 

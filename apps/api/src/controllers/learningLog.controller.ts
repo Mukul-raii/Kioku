@@ -5,8 +5,8 @@ import {
   resultGenerateModel,
   subTopicTestGeneration,
 } from "../libs/genai";
+import { clerkClient,User } from "@clerk/express";
 const prisma = new PrismaClient();
-
 export const createNewLearningLog = async (
   req: Request,
   res: Response
@@ -25,44 +25,28 @@ export const createNewLearningLog = async (
     category: string;
   } = req.body.data;
 
-  try {
-    if (!user || !topic || !notes || !date || !category) {
-      res.status(400).json({
-        message: "All fields are required",
-      });
-      console.log(
-        "all fields are required",
-        user,
-        topic,
-        notes,
-        date,
-        category
-      );
+  if (!user || !topic || !notes || !date || !category) {
+    res.status(400).json({
+      message: "All fields are required",
+    });
+    console.log("all fields are required", user, topic, notes, date, category);
 
-      return;
-    }
-    const newLearningLog = await prisma.learningLog.create({
-      data: {
-        userId: user,
-        topic,
-        notes,
-        date,
-        category,
-      },
-    });
-    console.log(newLearningLog);
-    res.status(200).json({
-      message: "Learning Log created successfully",
-      newLearningLog,
-    });
-  } catch (error) {
-    console.log(error);
-
-    res.status(500).json({
-      message: "Server Error",
-      error,
-    });
+    return;
   }
+  const newLearningLog = await prisma.learningLog.create({
+    data: {
+      userId: user,
+      topic,
+      notes,
+      date,
+      category,
+    },
+  });
+  console.log(newLearningLog);
+  res.status(200).json({
+    message: "Learning Log created successfully",
+    newLearningLog,
+  });
 };
 
 export const getLearningLogStats = async (
@@ -72,52 +56,45 @@ export const getLearningLogStats = async (
   const { userId } = req.query as { userId: string };
   console.log(userId);
 
-  try {
-    const learningLogs = await prisma.learningLog.findMany({
-      where: { userId },
-      include: {
-        review: {
-          include: {
-            testResult: {
-              orderBy: {
-                lastReviewed: "desc",
-              },
+  const learningLogs = await prisma.learningLog.findMany({
+    where: { userId },
+    include: {
+      review: {
+        include: {
+          testResult: {
+            orderBy: {
+              lastReviewed: "desc",
             },
           },
         },
       },
-    });
-console.log(JSON.stringify(learningLogs));
+    },
+  });
+  console.log(JSON.stringify(learningLogs));
 
-    const learningLogsWithStats = learningLogs.map((learningLog) => {
-      const testResult = learningLog.review?.[0]?.testResult || []
-      console.log(testResult);
+  const learningLogsWithStats = learningLogs.map((learningLog) => {
+    const testResult = learningLog.review?.[0]?.testResult || [];
+    console.log(testResult);
 
-      const lastScore = testResult.reduce(
-        (sum, result) => sum + result.lastScore,
-        0
-      );
-      const totalSubTopic = testResult.length;
-      const avgScore = lastScore / totalSubTopic;
-      const retention = (avgScore / 5) * 100;
-      return {
-        ...learningLog,
-        totalSubTopic: totalSubTopic,
-        retention: retention,
-      };
-    });
+    const lastScore = testResult.reduce(
+      (sum, result) => sum + result.lastScore,
+      0
+    );
+    const totalSubTopic = testResult.length;
+    const avgScore = lastScore / totalSubTopic;
+    const retention = (avgScore / 5) * 100;
+    return {
+      ...learningLog,
+      totalSubTopic: totalSubTopic,
+      retention: retention,
+    };
+  });
 
-    res.status(200).json({
-      message: "Learning Logs Fetched Successfully",
-      learningLogs,learningLogsWithStats
-    });
-
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({
-      message: "Server Not Responded",
-    });
-  }
+  res.status(200).json({
+    message: "Learning Logs Fetched Successfully",
+    learningLogs,
+    learningLogsWithStats,
+  });
 };
 
 export const updateLearningLog = async (
@@ -133,22 +110,16 @@ export const updateLearningLog = async (
     return;
   }
 
-  try {
-    const learningLog = await prisma.learningLog.update({
-      where: {
-        id: parseInt(logId),
-      },
-      data: {
-        category,
-        topic,
-        notes,
-      },
-    });
-  } catch (error) {
-    res.status(500).json({
-      message: "Server Not Responded",
-    });
-  }
+  const learningLog = await prisma.learningLog.update({
+    where: {
+      id: parseInt(logId),
+    },
+    data: {
+      category,
+      topic,
+      notes,
+    },
+  });
 };
 
 export const getAllLearningLogs = async (
@@ -157,26 +128,20 @@ export const getAllLearningLogs = async (
 ): Promise<void> => {
   const { userId } = req.query as { userId: string };
 
-  try {
-    if (!userId) {
-      res.status(400).json({
-        message: "User Id is required",
-      });
-    }
-
-    const learningLogs = await prisma.learningLog.findMany({
-      where: { userId },
-    });
-
-    res.status(200).json({
-      message: "Learning Logs Fetched Successfully",
-      learningLogs,
-    });
-  } catch (error) {
-    res.status(500).json({
-      message: "Server Not Responded",
+  if (!userId) {
+    res.status(400).json({
+      message: "User Id is required",
     });
   }
+
+  const learningLogs = await prisma.learningLog.findMany({
+    where: { userId },
+  });
+
+  res.status(200).json({
+    message: "Learning Logs Fetched Successfully",
+    learningLogs,
+  });
 };
 
 export const deleteLearningLog = async (
@@ -185,35 +150,29 @@ export const deleteLearningLog = async (
 ): Promise<void> => {
   const { id } = req.params;
 
-  try {
-    if (!id) {
-      res.status(400).json({
-        message: "Id is required",
-      });
-    }
-
-    const learningLog = await prisma.learningLog.delete({
-      where: {
-        id: parseInt(id),
-      },
-    });
-
-    res.status(200).json({
-      message: "Learning Log Deleted Successfully",
-      learningLog,
-    });
-  } catch (error) {
-    res.status(500).json({
-      message: "Server Not Responded",
+  if (!id) {
+    res.status(400).json({
+      message: "Id is required",
     });
   }
+
+  const learningLog = await prisma.learningLog.delete({
+    where: {
+      id: parseInt(id),
+    },
+  });
+
+  res.status(200).json({
+    message: "Learning Log Deleted Successfully",
+    learningLog,
+  });
 };
 
 export const generate_a_Test = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  const { id, isSubtopic } = req.query as { id: string; isSubtopic: string }; //learning log id
+  const { id, isSubTopic } = req.query as { id: string; isSubTopic: string }; //learning log id
 
   if (id === undefined || null) {
     res.status(400).json({
@@ -222,71 +181,60 @@ export const generate_a_Test = async (
     return;
   }
 
-  try {
-    if (parseInt(isSubtopic) !== 0) {
-      const learningLog = await prisma.learningLog.findMany({
-        where: {
-          id: parseInt(id),
-        },
-        include: {
-          review: {
-            include: {
-              testResult: {
-                where: {
-                  id: parseInt(isSubtopic),
-                },
+  if (parseInt(isSubTopic) !== 0) {
+    const learningLog = await prisma.learningLog.findMany({
+      where: {
+        id: parseInt(id),
+      },
+      include: {
+        review: {
+          include: {
+            testResult: {
+              where: {
+                id: parseInt(isSubTopic),
               },
             },
           },
         },
-      });
+      },
+    });
 
-      if (!learningLog) {
-        res.status(400).json({
-          message: "Learning Log Not Found",
-        });
-      }
-      const subTopic = learningLog[0].review[0].testResult[0];
-
-      const test = await subTopicTestGeneration(
-        `"Sub-Topic:"${subTopic.miniTopic}+ "Notes/syllabus of full Topic:" +${learningLog[0].notes}`
-      );
-
-      res.status(200).json({
-        message: "Test Generated Successfully",
-        test: test,
-      });
-    } else {
-      const learningLog = await prisma.learningLog.findUnique({
-        where: {
-          id: parseInt(id),
-        },
-      });
-
-      if (!learningLog) {
-        res.status(400).json({
-          message: "Learning Log Not Found",
-        });
-      }
-
-      const test = await testGenerateModel(
-        `"Topic:"${learningLog?.topic}+ "Notes/syllabus:" +${learningLog?.notes}`
-      );
-
-      res.status(200).json({
-        message: "Test Generated Successfully",
-        test: test,
+    if (!learningLog) {
+      res.status(400).json({
+        message: "Learning Log Not Found",
       });
     }
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({
-      message: "Server Not Responded",
-      error: {
-        message: error?.message,
-        stack: error?.stack,
-        name: error?.name,
+    const subTopic = learningLog[0].review[0].testResult[0];
+
+    const test = await subTopicTestGeneration(
+      `"Sub-Topic:"${subTopic.miniTopic}+ "Notes/syllabus of full Topic:" +${learningLog[0].notes}`
+    );
+    console.log(test);
+
+    res.status(200).json({
+      message: "Test Generated Successfully",
+      test: test,
+    });
+  } else {
+    const learningLog = await prisma.learningLog.findUnique({
+      where: {
+        id: parseInt(id),
       },
+    });
+
+    if (!learningLog) {
+      res.status(400).json({
+        message: "Learning Log Not Found",
+      });
+    }
+
+    const test = await testGenerateModel(
+      `"Topic:"${learningLog?.topic}+ "Notes/syllabus:" +${learningLog?.notes}`
+    );
+
+    res.status(200).json({
+      message: "Test Generated Successfully",
+      test: test,
     });
   }
 };
@@ -297,20 +245,14 @@ export const check_The_Result = async (
 ): Promise<void> => {
   const { question, correctAnswer, userAnswer } = req.body; //learning log id
 
-  try {
-    const testAnswer = await resultGenerateModel(
-      `"Question: "${question}+",Correct Answer :"+${correctAnswer}+" User Answer To Check: " +${userAnswer}`
-    );
+  const testAnswer = await resultGenerateModel(
+    `"Question: "${question}+",Correct Answer :"+${correctAnswer}+" User Answer To Check: " +${userAnswer}`
+  );
 
-    res.status(200).json({
-      message: "Check Generated Successfully",
-      test: testAnswer,
-    });
-  } catch (error) {
-    res.status(500).json({
-      message: "Server Not Responded",
-    });
-  }
+  res.status(200).json({
+    message: "Check Generated Successfully",
+    test: testAnswer,
+  });
 };
 
 export const generate_a_Result_New_Topic = async (
@@ -331,34 +273,26 @@ export const generate_a_Result_New_Topic = async (
     }, {})
   );
 
-  try {
-    const reviewGenerate = await prisma.review.create({
-      data: {
-        logId: id,
-        testResult: {
-          create: resa.map((r: any) => ({
-            miniTopic: r.subTopic,
-            lastScore: r.rating / r.totalNumber,
-            currentInterval: 1, // interval is days until next review
-            RepetitionCount: r.rating / r.totalNumber >= 3 ? 1 : 0, // repetition count is how many successful reviews you had
-            nextReviewDate: new Date(
-              new Date().setDate(new Date().getDate() + 1)
-            ),
-          })),
-        },
+  const reviewGenerate = await prisma.review.create({
+    data: {
+      logId: id,
+      testResult: {
+        create: resa.map((r: any) => ({
+          miniTopic: r.subTopic,
+          lastScore: r.rating / r.totalNumber,
+          currentInterval: 1, // interval is days until next review
+          RepetitionCount: r.rating / r.totalNumber >= 3 ? 1 : 0, // repetition count is how many successful reviews you had
+          nextReviewDate: new Date(
+            new Date().setDate(new Date().getDate() + 1)
+          ),
+        })),
       },
-    });
+    },
+  });
 
-    res.status(400).json({
-      message: "Result Generated Successfully",
-    });
-  } catch (error) {
-    console.log(error);
-
-    res.status(500).json({
-      message: "Server Not Responded",
-    });
-  }
+  res.status(400).json({
+    message: "Result Generated Successfully",
+  });
 };
 
 export const generate_a_Result_Sub_Topic = async (
@@ -394,31 +328,24 @@ export const generate_a_Result_Sub_Topic = async (
 
   const { interval, EF } = calculateInterval();
 
-  try {
-    const reviewGenerate = await prisma.testResults.update({
-      where: {
-        id: id,
-      },
-      data: {
-        lastScore: ratingAvg,
-        EF: EF,
-        currentInterval: interval, // interval is days until next review
-        RepetitionCount: previoustest?.RepetitionCount, // repetition count is how many successful reviews you had
-        nextReviewDate: new Date(
-          new Date().setDate(new Date().getDate() + interval)
-        ),
-      },
-    });
-    console.log(reviewGenerate);
+  const reviewGenerate = await prisma.testResults.update({
+    where: {
+      id: id,
+    },
+    data: {
+      lastScore: ratingAvg,
+      EF: EF,
+      currentInterval: interval, // interval is days until next review
+      RepetitionCount: previoustest?.RepetitionCount, // repetition count is how many successful reviews you had
+      nextReviewDate: new Date(
+        new Date().setDate(new Date().getDate() + interval)
+      ),
+    },
+  });
+  console.log(reviewGenerate);
 
-    res.status(400).json({
-      message: "Result Generated Successfully",
-    });
-  } catch (error) {
-    console.log(error);
-
-    res.status(500).json({
-      message: "Server Not Responded",
-    });
-  }
+  res.status(400).json({
+    message: "Result Generated Successfully",
+  });
 };
+

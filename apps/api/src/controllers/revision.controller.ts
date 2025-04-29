@@ -16,7 +16,6 @@ export const getAllRevision = async (
     return;
   }
 
-  try {
     const topics = await prisma.learningLog.findMany({
       where: {
         userId: userId,
@@ -62,11 +61,6 @@ export const getAllRevision = async (
       topics,
       miniTopics,
     });
-  } catch (error) {
-    res.status(500).json({
-      message: "Server Not Responded",
-    });
-  }
 };
 
 export const getProgress = async (
@@ -75,7 +69,6 @@ export const getProgress = async (
 ): Promise<void> => {
   console.log("startin");
 
-  try {
     const { userId } = req.query as { userId: string };
     const userid = await clerkClient.users.getUser(userId?.toString() || " ");
 
@@ -131,11 +124,4 @@ export const getProgress = async (
         masteredTopics,
         masteredTopicCount
     });
-  } catch (error) {
-    console.log(error);
-
-    res.status(500).json({
-      message: "Server Not Responded",
-    });
-  }
 };
