@@ -36,7 +36,7 @@ export default function ProcessPageView({
 }) {
   return (
     <>
-      <div className="flex items-center justify-between">
+     {/*  <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold tracking-tight">Progress</h1>
         <Select defaultValue="6months">
           <SelectTrigger className="w-[180px]">
@@ -51,7 +51,7 @@ export default function ProcessPageView({
           </SelectContent>
         </Select>
       </div>
-
+ */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">

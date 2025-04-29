@@ -32,11 +32,11 @@ export function SidebarLayout() {
       href: "/userdashboard/quick-review",
       icon: <CalendarCheck className="h-5 w-5 flex-shrink-0" />,
     },
-    {
+   /*  {
       label: "Progress",
       href: "/userdashboard/progress",
       icon: <BarChart2 className="h-5 w-5 flex-shrink-0" />,
-    },
+    }, */
     {
       label: "Insights",
       href: "/userdashboard/insights",

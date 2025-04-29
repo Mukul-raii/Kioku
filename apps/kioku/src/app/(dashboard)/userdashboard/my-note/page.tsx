@@ -10,20 +10,25 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useUser } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 import { LearningLogWithStats, MiniTopicForRevision } from "@repo/types";
+import axios from "axios";
 import {  Grid3X3Icon, List } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export default function MyNote() {
   const [isTable, setIsTable] = useState(true);
   const [data ,setData] = useState<LearningLogWithStats[]>([]);
+const {user} = useUser()
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const res = await get_all_learning_Log_stats()
+        const res = await get_all_learning_Log_stats(user.externalAccountsRaw)
         setData(res.learningLogsWithStats)
         
+
       } catch (error) {
         console.log(error);
       }

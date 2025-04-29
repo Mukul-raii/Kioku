@@ -71,6 +71,7 @@ export default function QuickReview() {
 
   async function getTestData() {
     try {
+        console.log(isSubtopic,logReview)
       const res = await get_a_test(logReview, isSubtopic);
       const data = JSON.parse(res);
 
@@ -92,6 +93,7 @@ export default function QuickReview() {
 
   useEffect(() => {
     if (logReview === null) return;
+    console.log("getting test data")
     getTestData();
   }, [logReview]);
 
