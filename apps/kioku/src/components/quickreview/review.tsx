@@ -37,7 +37,6 @@ export const ReviewList = memo(function ReviewList({
   );
   const [activeTab, setActiveTab] = useState("topics");
   const [filterCategory, setFilterCategory] = useState("all");
-  console.log("review list rendered");
 
   useEffect(() => {
     const isMounted = true;
@@ -47,22 +46,26 @@ export const ReviewList = memo(function ReviewList({
       try {
         setLoading(true);
         const res = await getAllRevision(user?.id || "");
+        console.log("data received ", res);
+
         if (isMounted) setData(res);
 
-        const subtopic: SubTopicAggregate[] = res.miniTopics.flatMap(
-          (subitem) =>
-            // For each miniTopic, either flatten or return an empty array
-            subitem.review?.flatMap((test) =>
-               test.testResult?.map((q) => ({
-                test: test.logId,
-                category: subitem.category,
-                id: q.id,
-                miniTopic: q.miniTopic,
-                lastScore: q.lastScore,
-                reviewDate: q.nextReviewDate,
-              }))
-            ) ?? []
-        );
+        const subtopic: SubTopicAggregate[] = res.miniTopics
+          .flatMap(
+            (subitem) =>
+              // For each miniTopic, either flatten or return an empty array
+              subitem.review?.flatMap((test) =>
+                test.testResult?.map((q) => ({
+                  test: test.logId,
+                  category: subitem.category,
+                  id: q.id,
+                  miniTopic: q.miniTopic,
+                  lastScore: q.lastScore,
+                  reviewDate: q.nextReviewDate,
+                }))
+              ) ?? []
+          )
+          .filter((item): item is SubTopicAggregate => item !== undefined);
 
         setSubTopicRevision(subtopic);
       } catch (error) {

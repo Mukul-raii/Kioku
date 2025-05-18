@@ -10,10 +10,11 @@ import {
   getAllLearningLogs,
   getLearningLogStats,
 } from "../controllers/learningLog.controller";
-import {  requireAuth } from "@clerk/express";
+import {  getAuth, requireAuth } from "@clerk/express";
 import { asyncHandler } from "../libs/asyncHandler";
 
 const router = Router();
+
 router.get("/get_all_learning_Log",requireAuth(), asyncHandler(getAllLearningLogs));
 router.get("/get_all_learning_Log_stats",requireAuth(), asyncHandler(getLearningLogStats));
 router.post("/new_learning_log",requireAuth(), asyncHandler(createNewLearningLog));

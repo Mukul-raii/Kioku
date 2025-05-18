@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import {
   Table,
@@ -17,7 +17,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { AlertCircle, BookOpen, Eye, BarChart3, Layers } from "lucide-react";
+import {
+  AlertCircle,
+  BookOpen,
+  Eye,
+  BarChart3,
+  Layers,
+  CalendarDays,
+} from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -29,6 +36,8 @@ import {
 import { ScrollArea } from "../ui/scroll-area";
 import TailwindAdvancedEditor from "../textEditor";
 import { LearningLogWithStats } from "@repo/types";
+import { Label } from "../ui/label";
+import NoteTaking from "./note-taking";
 
 export default function MyNotes({
   isTable,
@@ -39,15 +48,19 @@ export default function MyNotes({
 }) {
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
   const [isNotesOpen, setIsNotesOpen] = useState(false);
-  const [showNotesData,setShowNotesData ] = useState<string | null>(null);
-  
-  const getRetentionColor = (retention:number) => {
+  const [showNotesData, setShowNotesData] = useState<string | null>(null);
+  const [topic, setTopic] = useState<string | null>("");
+  const [category, setCategory] = useState<string | null>("");
+
+  const getRetentionColor = (retention: number) => {
     const retentionValue = retention || 0;
     if (retentionValue >= 80) return "text-green-500";
     if (retentionValue >= 50) return "text-yellow-500";
     return "text-red-500";
   };
 
+  console.log(Data);
+  
   return (
     <div className="my-10">
       {isTable ? (
@@ -109,6 +122,8 @@ export default function MyNotes({
                           className="hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-900 dark:hover:text-blue-300"
                           onClick={() => {
                             setShowNotesData(item.notes);
+                            setCategory(item.category);
+                            setTopic(item.topic);
                             setIsNotesOpen(true);
                           }}
                         >
@@ -200,7 +215,19 @@ export default function MyNotes({
       )}
 
       {showNotesData !== null && (
-        <Dialog
+        <NoteTaking
+          isOpen={isNotesOpen}
+          note={showNotesData}
+          onClose={() => {
+            setIsNotesOpen(false);
+            setShowNotesData(null);
+            window.localStorage.removeItem("novel-content");
+          }}
+          setcategory={category}
+          settopic={topic}
+        />
+
+        /*  <Dialog
           open={isNotesOpen}
           onOpenChange={(open) => {
             setIsNotesOpen(open);
@@ -214,12 +241,19 @@ export default function MyNotes({
             <DialogDescription>
               Here are the notes for this question:
             </DialogDescription>
-            <ScrollArea className="h-64 w-full">
-              <TailwindAdvancedEditor
-                value={showNotesData}
-                onChange={() => {}}
-              />
-            </ScrollArea>
+
+            <div className="space-y-2">
+              <div className="flex items-center">
+                <CalendarDays className="w-4 h-4 text-purple-500 mr-2" />
+                <Label className="font-medium text-white">Notes</Label>
+              </div>
+              <ScrollArea className="h-full w-full max-h-[40vh]">
+                <TailwindAdvancedEditor
+                  value={showNotesData}
+                  onChange={() => {}}
+                />
+              </ScrollArea>
+            </div>
             <DialogFooter>
               <Button
                 onClick={() => {
@@ -232,7 +266,7 @@ export default function MyNotes({
               </Button>
             </DialogFooter>
           </DialogContent>
-        </Dialog>
+        </Dialog> */
       )}
     </div>
   );

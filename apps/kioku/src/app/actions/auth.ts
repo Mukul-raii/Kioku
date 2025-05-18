@@ -8,6 +8,7 @@ export const signIn = async ({ email, imgUrl, name, userId }: userDetails) => {
   const token = getToken();
 
   if (!token) return null;
+  console.log(token);
 
   const res = await axios.post(
     `${process.env.NEXT_PUBLIC_BACKEND_API}/user/check-user`,
@@ -17,7 +18,7 @@ export const signIn = async ({ email, imgUrl, name, userId }: userDetails) => {
         Authorization: `Bearer ${token}`,
       },
     }
-  );
+  );  
 
   return res.status;
 };

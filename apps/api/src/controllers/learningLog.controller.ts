@@ -5,8 +5,10 @@ import {
   resultGenerateModel,
   subTopicTestGeneration,
 } from "../libs/genai";
-import { clerkClient,User } from "@clerk/express";
+import redis from "../libs/redis";
+import { log } from "@repo/logger";
 const prisma = new PrismaClient();
+
 export const createNewLearningLog = async (
   req: Request,
   res: Response
@@ -21,15 +23,16 @@ export const createNewLearningLog = async (
     user: string;
     topic: string;
     notes: string;
-    date: Date;
+    date: string;
     category: string;
   } = req.body.data;
+console.log(typeof(date));
 
   if (!user || !topic || !notes || !date || !category) {
     res.status(400).json({
       message: "All fields are required",
     });
-    console.log("all fields are required", user, topic, notes, date, category);
+    console.log("all fields are required", category);
 
     return;
   }
@@ -49,12 +52,24 @@ export const createNewLearningLog = async (
   });
 };
 
+//To get the learning logs For MY notes page 
 export const getLearningLogStats = async (
   req: Request,
   res: Response
 ): Promise<void> => {
   const { userId } = req.query as { userId: string };
-  console.log(userId);
+
+  const cachedLearningLogs = await redis.get(`learningLogs:${userId}`);
+  const cachedLearningLogsStats = await redis.get(`learningLogsStats:${userId}`);
+
+  if(cachedLearningLogs && cachedLearningLogsStats){
+    res.status(200).json({
+      message:"Learning Logs Fetched Successfully",
+      learningLogs: JSON.parse(cachedLearningLogs),
+      learningLogsWithStats: JSON.parse(cachedLearningLogsStats),
+    })
+    return
+  }
 
   const learningLogs = await prisma.learningLog.findMany({
     where: { userId },
@@ -70,11 +85,9 @@ export const getLearningLogStats = async (
       },
     },
   });
-  console.log(JSON.stringify(learningLogs));
 
   const learningLogsWithStats = learningLogs.map((learningLog) => {
     const testResult = learningLog.review?.[0]?.testResult || [];
-    console.log(testResult);
 
     const lastScore = testResult.reduce(
       (sum, result) => sum + result.lastScore,
@@ -90,6 +103,9 @@ export const getLearningLogStats = async (
     };
   });
 
+  await redis.set(`learningLogsStats:${userId}`, JSON.stringify(learningLogsWithStats), "EX", 60*60)
+  await redis.set(`learningLogs:${userId}`, JSON.stringify(learningLogs), "EX", 60*60)
+
   res.status(200).json({
     message: "Learning Logs Fetched Successfully",
     learningLogs,
@@ -103,6 +119,7 @@ export const updateLearningLog = async (
 ): Promise<void> => {
   const { logId } = req.params;
   const { notes, topic, category } = req.body;
+
   if (logId === undefined || null) {
     res.status(404).json({
       message: "Id is required",
@@ -127,11 +144,18 @@ export const getAllLearningLogs = async (
   res: Response
 ): Promise<void> => {
   const { userId } = req.query as { userId: string };
-
+  
   if (!userId) {
     res.status(400).json({
       message: "User Id is required",
     });
+  }
+  const cachedLearningLogs=await redis.get(`learningLogs:${userId}`)
+  if(cachedLearningLogs){
+    res.status(200).json({
+      message: "Learning Logs Fetched Successfully",
+      learningLogs: JSON.parse(cachedLearningLogs),
+    })
   }
 
   const learningLogs = await prisma.learningLog.findMany({
@@ -149,11 +173,13 @@ export const deleteLearningLog = async (
   res: Response
 ): Promise<void> => {
   const { id } = req.params;
+  const userId =req.auth.userId
 
   if (!id) {
     res.status(400).json({
       message: "Id is required",
     });
+    return
   }
 
   const learningLog = await prisma.learningLog.delete({
@@ -161,6 +187,8 @@ export const deleteLearningLog = async (
       id: parseInt(id),
     },
   });
+
+  await redis.del(`learningLogs:${userId}`, `learningLogsStats:${userId}`)
 
   res.status(200).json({
     message: "Learning Log Deleted Successfully",
@@ -209,7 +237,6 @@ export const generate_a_Test = async (
     const test = await subTopicTestGeneration(
       `"Sub-Topic:"${subTopic.miniTopic}+ "Notes/syllabus of full Topic:" +${learningLog[0].notes}`
     );
-    console.log(test);
 
     res.status(200).json({
       message: "Test Generated Successfully",
@@ -311,7 +338,6 @@ export const generate_a_Result_Sub_Topic = async (
       id,
     },
   });
-  console.log(id, previoustest);
 
   function calculateInterval() {
     let interval;
@@ -342,10 +368,8 @@ export const generate_a_Result_Sub_Topic = async (
       ),
     },
   });
-  console.log(reviewGenerate);
 
   res.status(400).json({
     message: "Result Generated Successfully",
   });
 };
-

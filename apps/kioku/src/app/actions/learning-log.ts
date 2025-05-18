@@ -4,10 +4,9 @@ import axios from "axios";
 import { auth } from "@clerk/nextjs/server";
 
 export const get_all_learning_Log_stats =
-  async (user:any): Promise<LearningLogsResponse> => {
+  async (): Promise<LearningLogsResponse> => {
     const { userId, getToken } = await auth();
     const token = await getToken();
-    
 
     const response = await axios.get(
       `${process.env.NEXT_PUBLIC_BACKEND_API}/learningLog/get_all_learning_Log_stats`,
@@ -20,6 +19,7 @@ export const get_all_learning_Log_stats =
         },
       }
     );
+
     return response.data;
   };
 
@@ -84,6 +84,8 @@ export const get_a_test = async (id: number, isSubtopic: number) => {
 export const get_a_test_result = async (id: number, result) => {
   const { getToken } = await auth();
   const token = await getToken();
+  console.log(id, result);
+
   const response = await axios.post(
     `${process.env.NEXT_PUBLIC_BACKEND_API}/learningLog/get_a_test_result`,
     { id, result },

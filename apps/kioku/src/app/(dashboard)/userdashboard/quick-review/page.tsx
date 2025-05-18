@@ -60,18 +60,18 @@ export default function QuickReview() {
   const handleShowNotes = useCallback((notes: string | null) => {
     setShowNotesId(notes);
     setIsNotesOpen(true);
-  },[]);
+  }, []);
   const setLogReviewCallback = useCallback((value) => {
     setLogReview(value);
   }, []);
-  
+
   const setISSubTopicCallback = useCallback((value) => {
     setISSubTopic(value);
   }, []);
 
   async function getTestData() {
     try {
-        console.log(isSubtopic,logReview)
+      console.log(isSubtopic, logReview);
       const res = await get_a_test(logReview, isSubtopic);
       const data = JSON.parse(res);
 
@@ -93,7 +93,7 @@ export default function QuickReview() {
 
   useEffect(() => {
     if (logReview === null) return;
-    console.log("getting test data")
+    console.log("getting test data");
     getTestData();
   }, [logReview]);
 
@@ -101,6 +101,8 @@ export default function QuickReview() {
   const totalQuestions = allQuestions?.length || 0;
 
   async function getResult() {
+    console.log(logReview, allAnswers);
+
     if (isSubtopic === 0) {
       const res = await get_a_test_result(logReview, allAnswers);
       console.log(res);
@@ -187,7 +189,6 @@ export default function QuickReview() {
       <ReviewList
         reviewToLog={setLogReviewCallback}
         isSubTopic={setISSubTopicCallback}
-        showNotes={handleShowNotes}
       />
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
@@ -385,45 +386,6 @@ export default function QuickReview() {
           </DialogContent>
         </Dialog>
       ) : null}
-
-      {showNotesId !== null && (
-        <Dialog
-          open={isNotesOpen}
-          onOpenChange={(open) => {
-            setIsNotesOpen(open);
-            if (!open) setShowNotesId(null);
-          }}
-        >
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Notes</DialogTitle>
-            </DialogHeader>
-            <DialogDescription>
-              Here are the notes for this question:
-            </DialogDescription>
-            <ScrollArea className="h-64 w-full">
-              <TailwindAdvancedEditor
-                value={showNotesId}
-                onChange={(e) => {
-                  console.log("changed", e);
-                }}
-              />
-            </ScrollArea>
-            <DialogFooter>
-              <Button
-                onClick={() => {
-                  setIsNotesOpen(false);
-                  setShowNotesId(null);
-                  const content =
-                    window.localStorage.removeItem("novel-content");
-                }}
-              >
-                Close
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-      )}
     </div>
   );
 }

@@ -40,21 +40,19 @@ const TailwindAdvancedEditor = ({ value, onChange }) => {
   const [openLink, setOpenLink] = useState(false);
   const [openAI, setOpenAI] = useState(false);
 
-
-  useEffect(()=>{
-
-    if(value!==null){
+  useEffect(() => {
+    if (value !== null) {
       console.log("setting connetnt ");
-       window.localStorage.removeItem("novel-content");
-      
-       window.localStorage.setItem("novel-content",value);
+      window.localStorage.removeItem("novel-content");
 
+      window.localStorage.setItem("novel-content", value);
+
+      console.log("intial contenet ", value);
       setInitialContent(JSON.parse(value));
-      console.log("intial contenet ",value); 
+      console.log("intial contenet ", value);
     }
-  },[value])
+  }, [value]);
 
-   
   const highlightCodeblocks = (content: string) => {
     const doc = new DOMParser().parseFromString(content, "text/html");
     doc.querySelectorAll("pre code").forEach((el) => {
@@ -68,7 +66,7 @@ const TailwindAdvancedEditor = ({ value, onChange }) => {
   const debouncedUpdates = useDebouncedCallback(
     async (editor: EditorInstance) => {
       console.log("editor", editor);
-      
+
       const json = editor.getJSON();
       setCharsCount(editor.storage.characterCount.words());
       window.localStorage.setItem(
@@ -96,9 +94,8 @@ const TailwindAdvancedEditor = ({ value, onChange }) => {
 
   if (!initialContent) return null;
 
-
   return (
-    <div className="relative h-full w-full max-w-screen-lg">
+    <div className="relative h-full w-full max-w-screen-lg ">
       <div className="flex absolute right-5 top-5 z-10 mb-5 gap-2">
         <div className="rounded-lg bg-accent px-2 py-1 text-sm text-muted-foreground">
           {saveStatus}
@@ -118,7 +115,7 @@ const TailwindAdvancedEditor = ({ value, onChange }) => {
           initialContent={initialContent}
           immediatelyRender={false}
           extensions={extensions}
-          className="relative min-h-[500px] w-full max-w-screen-lg border-muted bg-background sm:mb-[calc(20vh)] sm:rounded-lg sm:border sm:shadow-lg"
+          className="relative min-h-[500px] p-5 border-2 border-neutral-300 w-full max-w-screen-lg bg-background sm:mb-[calc(5vh)] sm:rounded-lg sm:border sm:shadow-lg"
           editorProps={{
             handleDOMEvents: {
               keydown: (_view, event) => handleCommandNavigation(event),

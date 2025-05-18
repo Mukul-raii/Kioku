@@ -1,12 +1,13 @@
-import Note_Taking from "@/components/notes/note-taking";
+"use client";
+import NoteTaking from "@/components/notes/note-taking";
 
-
-
-
-export default function addNote (){
-    return(
-        <div className="w-4xl">
-            <Note_Taking isOpen={true} onClose={()=>{}} />
-        </div>
-    )
+export default function AddNotePage() {
+  return (
+    <div className="w-full min-h-screen  flex items-center justify-center px-4 py-8">
+        <NoteTaking
+          renderInline={true}
+          onClose={() => console.log("Note saved")}
+        />
+    </div>
+  );
 }

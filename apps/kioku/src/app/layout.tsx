@@ -13,10 +13,23 @@ export const metadata: Metadata = {
 
 const inter = Inter({ subsets: ["latin"] });
 
-function onRender(id, phase, actualDuration, baseDuration, startTime, commitTime) {
+function onRender(
+  id,
+  phase,
+  actualDuration,
+  baseDuration,
+  startTime,
+  commitTime
+) {
   // Aggregate or log render timings...
-  console.log({id, phase, actualDuration, baseDuration, startTime, commitTime});
-  
+  console.log({
+    id,
+    phase,
+    actualDuration,
+    baseDuration,
+    startTime,
+    commitTime,
+  });
 }
 
 export default function RootLayout({

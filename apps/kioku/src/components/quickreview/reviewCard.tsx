@@ -14,7 +14,7 @@ import { BookOpen } from "lucide-react";
 import { TabsContent } from "../ui/tabs";
 import { memo } from "react";
 
-export const ReviewCard= memo(function ReviewCard({
+export const ReviewCard = memo(function ReviewCard({
   item,
   showNotes,
   setReview,
@@ -22,14 +22,16 @@ export const ReviewCard= memo(function ReviewCard({
   setSubTopicId,
   setNotesId,
 }: any) {
-  function handleTopicReview(id) {
+  function handleTopicReview(id: number) {
     setReview(id);
   }
-  function handleSubTopicReview(id, test) {
+
+  function handleSubTopicReview(id: number, test) {
+    console.log({ id, test });
     setSubTopicId(id);
     setReview(test);
   }
-  console.log(isSubtopic,item);
+  console.log(isSubtopic, item);
 
   return (
     <Card className="overflow-hidden transition-all hover:shadow-md">
@@ -47,28 +49,17 @@ export const ReviewCard= memo(function ReviewCard({
       </CardHeader>
 
       <CardContent className="pb-2">
-        <div className="flex items-center justify-between text-sm">
-          <span className="text-muted-foreground">Notes:</span>
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={() => setNotesId(item.notes)}
-            className="h-8 px-2"
-          >
-            View Notes
-          </Button>
-        </div>
-        {isSubtopic && (
-          <>
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-muted-foreground">Due:</span>
-              <span>{getDueStatus(item.dueDate)}</span>
-            </div>
+        <>
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-muted-foreground">Due:</span>
+            <span>{getDueStatus(isSubtopic ? item.dueDate : item.date)}</span>
+          </div>
+          {isSubtopic && (
             <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground">Rating:</span>
             </div>
-          </>
-        )}
+          )}
+        </>
       </CardContent>
 
       <CardFooter>
@@ -85,9 +76,9 @@ export const ReviewCard= memo(function ReviewCard({
       </CardFooter>
     </Card>
   );
-})
+});
 
-export const NoDataCard=memo(function NoDataCard({
+export const NoDataCard = memo(function NoDataCard({
   title,
   message,
 }: {
@@ -103,4 +94,4 @@ export const NoDataCard=memo(function NoDataCard({
       <p className="text-muted-foreground mb-4">{message}</p>
     </Card>
   );
-})
+});

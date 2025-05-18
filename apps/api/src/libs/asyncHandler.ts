@@ -1,4 +1,4 @@
-import {  Request, Response, NextFunction, RequestHandler } from "express";
+import { Request, Response, NextFunction, RequestHandler } from "express";
 
 export const asyncHandler =
   (fn: RequestHandler): RequestHandler =>
@@ -6,14 +6,16 @@ export const asyncHandler =
     Promise.resolve(fn(req, res, next)).catch(next);
   };
 
-export const errrorHandler = (err: any, req: Request, res: Response, next: NextFunction) => {
-     console.log(err.stack);
+export const errrorHandler = (
+  err: any,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
 
-    res.status(err.statusCode || 500).json({
-      success:false,
-      message:  "Something broke!",
-      error: err.message || err,
-    })
-}
-
-
+  res.status(err.statusCode || 500).json({
+    success: false,
+    message: "Something broke!",
+    error: err.message || err,
+  });
+};

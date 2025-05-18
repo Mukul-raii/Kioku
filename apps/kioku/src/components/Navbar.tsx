@@ -7,42 +7,21 @@ import {
   UserButton,
   useUser,
 } from "@clerk/nextjs";
-import { useCallback, useEffect } from "react";
-import { signIn } from "@/app/actions/auth";
 import { usePathname, useRouter } from "next/navigation";
-import Link from "next/link";
-import { DotIcon } from "lucide-react";
-import { Button } from "./ui/button";
 import { ButtonColorful } from "./ui/button-colorful";
+import Link from "next/link";
 
 export default function Navbar() {
   const { isSignedIn, user, isLoaded } = useUser();
   const pathName = usePathname();
   const router = useRouter();
-  useEffect(() => {
-    const checkUser = async () => {
-      if (!isSignedIn || !user) return;
 
-      if (user) {
-        console.log(user);
-        try {
-          const res = await signIn({
-            email: user.primaryEmailAddress?.emailAddress ?? "",
-            imgUrl: user.imageUrl ?? "",
-            name: user.fullName ?? "",
-            userId: user.id,
-          });
-        } catch (error) {
-          console.error("Error checking user:", error);
-        }
-      }
-    };
-    checkUser();
-  }, [user]);
+
+
 
   if (!isLoaded) {
     return (
-      <div className="fixed top-0 left-0 w-full h-16 flex items-center justify-center bg-gray-900 bg-opacity-95 backdrop-blur-sm">
+      <div className="fixed top-0 left-0 w-full h-16 flex items-center justify-between bg-gray-900 bg-opacity-95 backdrop-blur-sm">
         <div className="animate-pulse flex space-x-4">
           <div className="h-3 w-24 bg-gray-600 rounded"></div>
           <div className="h-3 w-24 bg-gray-600 rounded"></div>
@@ -53,7 +32,7 @@ export default function Navbar() {
 
   return (
     <div className="fixed top-0 left-0 w-full h-16  bg-opacity-90 backdrop-blur-sm text-white shadow-lg z-50">
-      <div className="max-w-7xl mx-auto h-full flex items-center justify-between px-4 md:px-8 lg:px-12">
+      <div className=" mx-auto h-full flex items-center justify-between px-6 md:px-8 lg:px-12">
         <h1
           onClick={() => router.push("/")}
           className="text-4xl  md:text-3xl font-bold tracking-tight bg-gradient-to-r from-indigo-400 to-purple-500 bg-clip-text text-transparent cursor-pointer"
@@ -91,12 +70,14 @@ export default function Navbar() {
             </SignedOut>
 
             {pathName === "/" && isSignedIn ? (
-                 <Link href="/userdashboard">
-                 <div className="flex cursor-pointer items-center gap-2">
-                   <ButtonColorful className="rounded-4xl cursor-pointer" label="Dashboard" />
-                 </div>
-               </Link>
-             
+              <Link href="/userdashboard">
+                <div className="flex cursor-pointer items-center gap-2">
+                  <ButtonColorful
+                    className="rounded-4xl cursor-pointer"
+                    label="Dashboard"
+                  />
+                </div>
+              </Link>
             ) : (
               <SignedIn>
                 <UserButton

@@ -47,8 +47,8 @@ export function SidebarLayout() {
   const [open, setOpen] = useState(false);
 
   return (
-    <div>
-      <Sidebar open={open} setOpen={setOpen}>
+    <div className="my-10  text-white rounded-3xl">
+      <Sidebar  open={open} setOpen={setOpen}>
         <SidebarBody className="justify-between gap-10">
           <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
             <div className="mt-8 flex flex-col gap-2">
