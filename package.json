@@ -2,7 +2,7 @@
   "name": "kitchen-sink",
   "private": true,
   "scripts": {
-    "build": "turbo run build",
+    "build": "npm --prefix packages/logger run build && npm --prefix apps/api run build",
     "clean": "turbo run clean",
     "dev": "turbo run dev",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
