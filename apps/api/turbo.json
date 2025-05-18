@@ -1,9 +1,18 @@
 {
-  "extends": ["//"],
-  "tasks": {
+  "extends": [
+    "//"
+  ],
+  "pipeline": {
     "build": {
-      "env": ["PORT"],
-      "outputs": ["dist/**"]
-    }
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        "dist/**"
+      ],
+      "env": [
+        "PORT"
+      ]
+    },
   }
 }
