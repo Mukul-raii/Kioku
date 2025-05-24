@@ -8,6 +8,8 @@ export const createNewUser = async (
   req: Request,
   res: Response
 ): Promise<void> => {
+  console.log(req.body);
+  
   const { email, name, imgUrl, userId }:userAuth = req.body;
   
   if (!email || !name || !imgUrl || !userId) {

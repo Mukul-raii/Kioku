@@ -1,44 +1,35 @@
 import { Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
-import {
-  testGenerateModel,
-  resultGenerateModel,
-  subTopicTestGeneration,
-} from "../libs/genai";
+import {resultGenerateModel} from "../libs/genai";
 import redis from "../libs/redis";
-import { log } from "@repo/logger";
+import { zodValidation, sendResponse, sendError } from "../libs/asyncHandler";
+import { newNoteSchema } from "@repo/types";
+import { generate_a_new_Test } from "../service/test.service";
 const prisma = new PrismaClient();
+
 
 export const createNewLearningLog = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  const {
-    user,
-    topic,
-    notes,
-    date,
-    category,
-  }: {
-    user: string;
-    topic: string;
-    notes: string;
-    date: string;
-    category: string;
-  } = req.body.data;
-console.log(typeof(date));
+  console.log("userid chechking ",req.auth)
+  const userId = req.auth.userId;
+  const { notes, topic, category } = req.body;
 
-  if (!user || !topic || !notes || !date || !category) {
-    res.status(400).json({
-      message: "All fields are required",
-    });
-    console.log("all fields are required", category);
-
+  if (!userId) {
+    sendError(res, 401, "Unauthorized - User ID not found");
     return;
   }
+  const validate = zodValidation(newNoteSchema, req.body);
+  
+  if (!validate.success) {
+    sendError(res, 400, "Validation failed", validate.error?.errors);
+    return;
+  }
+  console.log(userId);
   const newLearningLog = await prisma.learningNote.create({
     data: {
-      userId: user,
+      userId: userId,
       topic,
       notes,
       category,
@@ -51,65 +42,82 @@ console.log(typeof(date));
   });
 };
 
-//To get the learning logs For MY notes page 
+//To get the learning logs For MY notes page
 export const getLearningLogStats = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  const { userId } = req.query as { userId: string };
+  const userId = req.auth.userId;
 
-  const cachedLearningLogs = await redis.get(`learningLogs:${userId}`);
-  const cachedLearningLogsStats = await redis.get(`learningLogsStats:${userId}`);
-
-  if(cachedLearningLogs && cachedLearningLogsStats){
-    res.status(200).json({
-      message:"Learning Logs Fetched Successfully",
-      learningLogs: JSON.parse(cachedLearningLogs),
-      learningLogsWithStats: JSON.parse(cachedLearningLogsStats),
-    })
-    return
+  if (!userId) {
+    sendError(res, 401, "Unauthorized - User ID not found");
+    return;
   }
 
-  const learningLogs = await prisma.learningNote.findMany({
-    where: { userId },
-    include: {
-      review: {
-        include: {
-          testResult: {
-            orderBy: {
-              lastReviewed: "desc",
+  try {
+    const cachedLearningLogs = await redis.get(`learningLogs:${userId}`);
+    const cachedLearningLogsStats = await redis.get(`learningLogsStats:${userId}`);
+
+    if (cachedLearningLogs && cachedLearningLogsStats) {
+      sendResponse(res, 200, "Learning Logs Fetched Successfully", {
+        learningLogs: JSON.parse(cachedLearningLogs),
+        learningLogsWithStats: JSON.parse(cachedLearningLogsStats),
+      });
+      return;
+    }
+
+    const learningLogs = await prisma.learningNote.findMany({
+      where: { userId },
+      include: {
+        review: {
+          include: {
+            testResult: {
+              orderBy: {
+                lastReviewed: "desc",
+              },
             },
           },
         },
       },
-    },
-  });
+    });
 
-  const learningLogsWithStats = learningLogs.map((learningLog) => {
-    const testResult = learningLog.review?.[0]?.testResult || [];
+    const learningLogsWithStats = learningLogs.map((learningLog) => {
+      const testResult = learningLog.review?.[0]?.testResult || [];
 
-    const lastScore = testResult.reduce(
-      (sum, result) => sum + result.lastScore,
-      0
+      const lastScore = testResult.reduce(
+        (sum, result) => sum + result.lastScore,
+        0
+      );
+      const totalSubTopic = testResult.length;
+      const avgScore = lastScore / totalSubTopic;
+      const retention = (avgScore / 5) * 100;
+      return {
+        ...learningLog,
+        totalSubTopic: totalSubTopic,
+        retention: retention,
+      };
+    });
+
+    await redis.set(
+      `learningLogsStats:${userId}`,
+      JSON.stringify(learningLogsWithStats),
+      "EX",
+      60 * 60
     );
-    const totalSubTopic = testResult.length;
-    const avgScore = lastScore / totalSubTopic;
-    const retention = (avgScore / 5) * 100;
-    return {
-      ...learningLog,
-      totalSubTopic: totalSubTopic,
-      retention: retention,
-    };
-  });
+    await redis.set(
+      `learningLogs:${userId}`,
+      JSON.stringify(learningLogs),
+      "EX",
+      60 * 60
+    );
 
-  await redis.set(`learningLogsStats:${userId}`, JSON.stringify(learningLogsWithStats), "EX", 60*60)
-  await redis.set(`learningLogs:${userId}`, JSON.stringify(learningLogs), "EX", 60*60)
-
-  res.status(200).json({
-    message: "Learning Logs Fetched Successfully",
-    learningLogs,
-    learningLogsWithStats,
-  });
+    sendResponse(res, 200, "Learning Logs Fetched Successfully", {
+      learningLogs,
+      learningLogsWithStats,
+    });
+  } catch (error) {
+    sendError(res, 500, "Failed to fetch learning logs", error);
+  }
 };
 
 export const updateLearningLog = async (
@@ -118,53 +126,75 @@ export const updateLearningLog = async (
 ): Promise<void> => {
   const { logId } = req.params;
   const { notes, topic, category } = req.body;
+  const userId = req.auth.userId;
 
-  if (logId === undefined || null) {
-    res.status(404).json({
-      message: "Id is required",
-    });
+  if (!userId) {
+    sendError(res, 401, "Unauthorized - User ID not found");
     return;
   }
 
-  const learningLog = await prisma.learningNote.update({
-    where: {
-      id: parseInt(logId),
-    },
-    data: {
-      category,
-      topic,
-      notes,
-    },
-  });
+  if (!logId) {
+    sendError(res, 400, "Learning log ID is required");
+    return;
+  }
+
+  try {
+    const updatedLog = await prisma.learningNote.update({
+      where: {
+        id: parseInt(logId),
+        userId, // Ensure user can only update their own logs
+      },
+      data: {
+        category,
+        topic,
+        notes,
+      },
+    });
+
+    sendResponse(res, 200, "Successfully updated", updatedLog);
+  } catch (error) {
+    sendError(res, 500, "Failed to update learning log", error);
+  }
 };
 
 export const getAllLearningLogs = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  const { userId } = req.query as { userId: string };
-  
+  const userId = req.auth.userId;
+
   if (!userId) {
-    res.status(400).json({
-      message: "User Id is required",
+    sendError(res, 401, "Unauthorized - User ID not found");
+    return;
+  }
+
+  try {
+    const cachedLearningLogs = await redis.get(`learningLogs:${userId}`);
+    if (cachedLearningLogs) {
+      sendResponse(res, 200, "Learning Logs Fetched Successfully", {
+        learningLogs: JSON.parse(cachedLearningLogs),
+      });
+      return;
+    }
+
+    const learningLogs = await prisma.learningNote.findMany({
+      where: { userId },
     });
-  }
-  const cachedLearningLogs=await redis.get(`learningLogs:${userId}`)
-  if(cachedLearningLogs){
-    res.status(200).json({
-      message: "Learning Logs Fetched Successfully",
-      learningLogs: JSON.parse(cachedLearningLogs),
-    })
-  }
 
-  const learningLogs = await prisma.learningNote.findMany({
-    where: { userId },
-  });
+    // Cache the results for future requests
+    await redis.set(
+      `learningLogs:${userId}`,
+      JSON.stringify(learningLogs),
+      "EX",
+      60 * 60
+    );
 
-  res.status(200).json({
-    message: "Learning Logs Fetched Successfully",
-    learningLogs,
-  });
+    sendResponse(res, 200, "Learning Logs Fetched Successfully", {
+      learningLogs,
+    });
+  } catch (error) {
+    sendError(res, 500, "Failed to fetch learning logs", error);
+  }
 };
 
 export const deleteLearningLog = async (
@@ -172,113 +202,102 @@ export const deleteLearningLog = async (
   res: Response
 ): Promise<void> => {
   const { id } = req.params;
-  const userId =req.auth.userId
+  const userId = req.auth.userId;
 
-  if (!id) {
-    res.status(400).json({
-      message: "Id is required",
-    });
-    return
+  if (!userId) {
+    sendError(res, 401, "Unauthorized - User ID not found");
+    return;
   }
 
-  const learningLog = await prisma.learningNote.delete({
-    where: {
-      id: parseInt(id),
-    },
-  });
+  if (!id) {
+    sendError(res, 400, "Learning log ID is required");
+    return;
+  }
 
-  await redis.del(`learningLogs:${userId}`, `learningLogsStats:${userId}`)
+  try {
+    const learningLog = await prisma.learningNote.delete({
+      where: {
+        id: parseInt(id),
+        userId, // Ensure user can only delete their own logs
+      },
+    });
 
-  res.status(200).json({
-    message: "Learning Log Deleted Successfully",
-    learningLog,
-  });
+    // Clear cache for this user
+    await redis.del(`learningLogs:${userId}`, `learningLogsStats:${userId}`);
+
+    sendResponse(res, 200, "Learning Log Deleted Successfully", learningLog);
+  } catch (error) {
+    sendError(res, 500, "Failed to delete learning log", error);
+  }
 };
 
 export const generate_a_Test = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  const { id, isSubTopic } = req.query as { id: string; isSubTopic: string }; //learning log id
-
-  if (id === undefined || null) {
-    res.status(400).json({
-      message: "Id is required",
-    });
+  console.log("generate a test",req.params)
+  const userId = req.auth.userId;
+  const { id, isSubTopic } = req.params
+  const {mode , difficulty}: {mode:string,difficulty:string} = req.body 
+  console.log(userId,id,isSubTopic);
+  
+  if (!userId) {
+    sendError(res, 401, "Unauthorized - User ID not found");
     return;
   }
 
-  if (parseInt(isSubTopic) !== 0) {
-    const learningLog = await prisma.learningNote.findMany({
-      where: {
-        id: parseInt(id),
-      },
-      include: {
-        review: {
-          include: {
-            testResult: {
-              where: {
-                id: parseInt(isSubTopic),
-              },
-            },
-          },
-        },
-      },
-    });
-
-    if (!learningLog) {
-      res.status(400).json({
-        message: "Learning Log Not Found",
-      });
-    }
-    const subTopic = learningLog[0].review[0].testResult[0];
-
-    const test = await subTopicTestGeneration(
-      `"Sub-Topic:"${subTopic.miniTopic}+ "Notes/syllabus of full Topic:" +${learningLog[0].notes}`
-    );
-
-    res.status(200).json({
-      message: "Test Generated Successfully",
-      test: test,
-    });
-  } else {
-    const learningLog = await prisma.learningNote.findUnique({
-      where: {
-        id: parseInt(id),
-      },
-    });
-
-    if (!learningLog) {
-      res.status(400).json({
-        message: "Learning Log Not Found",
-      });
-    }
-
-    const test = await testGenerateModel(
-      `"Topic:"${learningLog?.topic}+ "Notes/syllabus:" +${learningLog?.notes}`
-    );
-
-    res.status(200).json({
-      message: "Test Generated Successfully",
-      test: test,
-    });
+  if (!id) {
+    sendError(res, 400, "Learning log ID is required");
+    return;
   }
-};
+
+  try {
+      const get_a_new_test = await generate_a_new_Test.generateTest({
+        learningLogId:parseInt(id),
+        subTopicId:isSubTopic === "1" ? parseInt(id): undefined,
+        mode:"Long",
+        userId,
+        difficulty:"HARD",
+      })
+
+    sendResponse(res, 200, "Test Generated Successfully", { get_a_new_test });
+  } catch (error) {
+    sendError(res, 500, "Failed to generate test", error);
+  }
+}
 
 export const check_The_Result = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  const { question, correctAnswer, userAnswer } = req.body; //learning log id
+  const { question, correctAnswer, userAnswer } = req.body;
+  const userId = req.auth.userId;
 
-  const testAnswer = await resultGenerateModel(
-    `"Question: "${question}+",Correct Answer :"+${correctAnswer}+" User Answer To Check: " +${userAnswer}`
-  );
+  if (!userId) {
+    sendError(res, 401, "Unauthorized - User ID not found");
+    return;
+  }
 
-  res.status(200).json({
-    message: "Check Generated Successfully",
-    test: testAnswer,
-  });
+  if (!question || !correctAnswer || !userAnswer) {
+    sendError(
+      res,
+      400,
+      "Question, correct answer, and user answer are required"
+    );
+    return;
+  }
+
+  try {
+    const testAnswer = await resultGenerateModel(
+      `"Question: "${question}+",Correct Answer :"+${correctAnswer}+" User Answer To Check: " +${userAnswer}`
+    );
+
+    sendResponse(res, 200, "Check Generated Successfully", {
+      test: testAnswer,
+    });
+  } catch (error) {
+    sendError(res, 500, "Failed to check answer", error);
+  }
 };
 
 export const generate_a_Result_New_Topic = async (
@@ -287,18 +306,7 @@ export const generate_a_Result_New_Topic = async (
 ): Promise<void> => {
   const { id, result } = req.body; //learning log id
 
-  const resa = Object.values(
-    result.reduce((acc, item) => {
-      if (!acc[item.subTopic]) {
-        acc[item.subTopic] = { ...item, totalNumber: 1 };
-      } else {
-        acc[item.name].rating += item.rating;
-        acc[item.name].totalNumber += 1;
-      }
-      return acc;
-    }, {})
-  );
-
+ /* 
   const reviewGenerate = await prisma.review.create({
     data: {
       logId: id,
@@ -311,64 +319,68 @@ export const generate_a_Result_New_Topic = async (
           nextReviewDate: new Date(
             new Date().setDate(new Date().getDate() + 1)
           ),
-        })),
-      },
-    },
-  });
-
-  res.status(400).json({
-    message: "Result Generated Successfully",
-  });
-};
+        },
+    ))}; */
+}
 
 export const generate_a_Result_Sub_Topic = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  const { id, result } = req.body; //learning log id
-  const ratedResults = result.filter((item) => item.rating !== null);
+  const { id, result } = req.body;
+  const userId = req.auth.userId;
 
-  const total = ratedResults.reduce((sum, item) => sum + item.rating, 0);
-  const ratingAvg: number =
-    ratedResults.length > 0 ? total / ratedResults.length : 0;
-
-  const previoustest = await prisma.testResults.findFirst({
-    where: {
-      id,
-    },
-  });
-
-  function calculateInterval() {
-    let interval;
-    let EF = previoustest?.EF || 2.5;
-    if (ratingAvg >= 3) {
-      if (previoustest?.RepetitionCount == 1) interval = 2;
-      else if (previoustest?.RepetitionCount == 2) interval = 6;
-      else interval = previoustest?.currentInterval || 1 * EF;
-      EF = EF + (0.1 - (5 - ratingAvg) * (0.08 + (5 - ratingAvg) * 0.02));
-      EF = Math.max(EF, 1.3);
-    }
-    return { interval, EF };
+  if (!userId) {
+    sendError(res, 401, "Unauthorized - User ID not found");
+    return;
   }
 
-  const { interval, EF } = calculateInterval();
+  if (!id || !result) {
+    sendError(res, 400, "Test result ID and result data are required");
+    return;
+  }
 
-  const reviewGenerate = await prisma.testResults.update({
-    where: {
-      id: id,
-    },
-    data: {
-      lastScore: ratingAvg,
-      EF: EF,
-      currentInterval: interval, // interval is days until next review
-      RepetitionCount: previoustest?.RepetitionCount, // repetition count is how many successful reviews you had
-      nextReviewDate: new Date(
-        new Date().setDate(new Date().getDate() + interval)
-      ),
-    },
-  });
-
-  res.status(400).json({
-    message: "Result Generated Successfully",
-  });
+  try {
+ 
+/*     const reviewGenerate = await prisma.testResults.update({
+      where: {
+        id: id,
+      },
+      data: {
+        lastScore: ratingAvg,
+        EF: EF,
+        currentInterval: interval,
+        RepetitionCount:
+          (previoustest?.RepetitionCount || 0) + (ratingAvg >= 3 ? 1 : 0),
+        nextReviewDate: new Date(
+          new Date().setDate(new Date().getDate() + interval)
+        ),
+      },
+    });
+ */
+    sendResponse(res, 200, "Result Generated Successfully");
+  } catch (error) {
+    sendError(res, 500, "Failed to generate sub-topic result", error);
+  }
 };
+
+export const generate_a_quick_test = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const userId = req.auth.userId;
+
+  if (!userId) {
+    sendError(res, 401, "Unauthorized - User ID not found");
+    return;
+  }
+
+  try {
+    
+  
+  } catch (error) {
+    sendError(res, 500, "Failed to generate quick test", error);
+  }
+};
+
+

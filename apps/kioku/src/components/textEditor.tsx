@@ -40,18 +40,24 @@ const TailwindAdvancedEditor = ({ value, onChange }) => {
   const [openLink, setOpenLink] = useState(false);
   const [openAI, setOpenAI] = useState(false);
 
-  useEffect(() => {
-    if (value !== null) {
-      console.log("setting connetnt ");
+useEffect(() => {
+  if (value !== null && value !== undefined && value !== "") {
+    try {
+      const parsedValue = typeof value === "string" ? JSON.parse(value) : value;
+      
       window.localStorage.removeItem("novel-content");
-
-      window.localStorage.setItem("novel-content", value);
-
-      console.log("intial contenet ", value);
-      setInitialContent(JSON.parse(value));
-      console.log("intial contenet ", value);
+      window.localStorage.setItem("novel-content", JSON.stringify(parsedValue));
+      
+      setInitialContent(parsedValue);
+    } catch (error) {
+      console.error("Invalid JSON value:", value, error);
+      // Fallback to empty content if JSON is invalid
+      const emptyContent = { type: "doc", content: [] };
+      setInitialContent(emptyContent);
+      window.localStorage.setItem("novel-content", JSON.stringify(emptyContent));
     }
-  }, [value]);
+  }
+}, [value]);
 
   const highlightCodeblocks = (content: string) => {
     const doc = new DOMParser().parseFromString(content, "text/html");
@@ -79,7 +85,7 @@ const TailwindAdvancedEditor = ({ value, onChange }) => {
         editor.storage.markdown.getMarkdown()
       );
       console.log(json.content);
-
+      onChange(JSON.stringify(json));
       setSaveStatus("Saved");
     },
     500
@@ -90,7 +96,7 @@ const TailwindAdvancedEditor = ({ value, onChange }) => {
     onChange(content);
     if (content) setInitialContent(JSON.parse(content));
     else setInitialContent({ type: "doc", content: [] });
-  }, []);
+  },[]);
 
   if (!initialContent) return null;
 

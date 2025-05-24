@@ -1,10 +1,10 @@
 import { Router } from "express";
-import { createNewUser } from "../controllers/user.controller";
 import {  requireAuth } from "@clerk/express";
 import { asyncHandler } from "../libs/asyncHandler";
+import { new_quick_test } from "../controllers/quick-test.controller";
 
 const router = Router();
 
-router.post("/check-user", asyncHandler(createNewUser));
+router.post("/create",requireAuth(), asyncHandler(new_quick_test));
 
 export default router;

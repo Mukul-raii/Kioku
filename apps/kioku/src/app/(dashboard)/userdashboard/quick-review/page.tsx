@@ -185,7 +185,6 @@ export default function QuickReview() {
 
   return (
     <div className="container mx-auto py-8 px-4">
-      {/* List the review Card .... */}
       <ReviewList
         reviewToLog={setLogReviewCallback}
         isSubTopic={setISSubTopicCallback}

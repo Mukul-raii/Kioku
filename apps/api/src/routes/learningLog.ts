@@ -19,7 +19,7 @@ router.get("/get_all_learning_Log_stats",requireAuth(), asyncHandler(getLearning
 router.post("/new_learning_log",requireAuth(), asyncHandler(createNewLearningLog));
 router.put("/new_learning_log",requireAuth(), asyncHandler(createNewLearningLog));
 router.delete("/learning_log_delete",requireAuth(), asyncHandler(deleteLearningLog));
-router.post("/get_a_test",requireAuth(), asyncHandler(generate_a_Test));
+router.post("/get_a_test/:id/:isSubTopic",requireAuth(), asyncHandler(generate_a_Test));
 router.post("/check_test_result",requireAuth(), asyncHandler(check_The_Result));
 router.post("/get_a_test_result",requireAuth(), asyncHandler(generate_a_Result_New_Topic));
 router.post("/get_a_sub_test_result",requireAuth(), asyncHandler(generate_a_Result_Sub_Topic));

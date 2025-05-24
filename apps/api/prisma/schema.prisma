@@ -21,7 +21,7 @@ model User {
   imageUrl    String?
   learningLog LearningNote[]
   category    Category[]
-  customTest  CustomTest[]
+  quickquiz  QuickQuiz[]
   review      Review[]
   createdDate DateTime       @default(now())
   updatedDate DateTime       @updatedAt
@@ -31,10 +31,10 @@ model Category {
   id            Int            @id @default(autoincrement()) // Primary key
   user          User           @relation(fields: [userId], references: [userId]) // Relation to User
   userId        String // Foreign key for User
-  catergoryName String // Name of the category
+  categoryName String          @unique// Name of the category
   learningLogs  LearningNote[] // Relation to LearningLog
   createdDate   DateTime       @default(now()) // Automatically set creation date
-  customTest    CustomTest[]
+  quickquiz    QuickQuiz[]
 }
 
 model LearningNote {
@@ -53,20 +53,18 @@ model LearningNote {
   categoryId  Int?
 }
 
-model CustomTest {
+model QuickQuiz {
   id          Int       @id @default(autoincrement())
   user        User      @relation(fields: [userId], references: [userId])
   userId      String
   topic       String
-  //category    Category @relation(fields: [categoryId], references: [id])
-  // categoryId  Int
   category    String
-  notes       String
-  review      Review[]  @relation("CustomTestReviews")
+  categoryId  Int?
+  review      Review[]  @relation("QuickQuizReviews")
+  scheduledDate DateTime
   updateDate  DateTime  @updatedAt()
   createdDate DateTime  @default(now())
   Category    Category? @relation(fields: [categoryId], references: [id])
-  categoryId  Int?
 }
 
 model Review {
@@ -79,7 +77,7 @@ model Review {
 
   user        User          @relation(fields: [userId], references: [userId])
   learningLog LearningNote? @relation("LearningNoteReviews", fields: [logId], references: [id])
-  customTest  CustomTest?   @relation("CustomTestReviews", fields: [testId], references: [id])
+  quickquiz  QuickQuiz?   @relation("QuickQuizReviews", fields: [testId], references: [id])
   testResult  TestResults[]
 }
 

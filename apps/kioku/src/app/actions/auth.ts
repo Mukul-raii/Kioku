@@ -1,11 +1,11 @@
-"use server";
-import axios from "axios";
-import { auth } from "@clerk/nextjs/server";
-import { userDetails } from "@repo/types";
+'use server';
+import axios from 'axios';
+import { auth } from '@clerk/nextjs/server';
+import { userAuth } from '@repo/types';
 
-export const signIn = async ({ email, imgUrl, name, userId }: userDetails) => {
+export const signIn = async ({ email, imgUrl, name, userId }: userAuth) => {
   const { getToken } = await auth();
-  const token = getToken();
+  const token = await getToken();
 
   if (!token) return null;
   console.log(token);
@@ -17,8 +17,8 @@ export const signIn = async ({ email, imgUrl, name, userId }: userDetails) => {
       headers: {
         Authorization: `Bearer ${token}`,
       },
-    }
-  );  
+    },
+  );
 
   return res.status;
 };

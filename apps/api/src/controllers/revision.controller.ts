@@ -29,16 +29,16 @@ export const getAllRevision = async (
     const cachedTopics = await redis.get(`topics:${userId}`);
     const cachedMiniTopics = await redis.get(`miniTopics:${userId}`);
 
-      if(cachedTopics && cachedMiniTopics){
+   /*    if(cachedTopics && cachedMiniTopics){
        res.status(200).json({
         message: "Revision Fetched Successfully",
         topics: JSON.parse(cachedTopics),
         miniTopics: JSON.parse(cachedMiniTopics),
       });
       return;
-     }
+     } */
      
-    const topics = await prisma.learningLog.findMany({
+    const topics = await prisma.learningNote.findMany({
       where: {
         userId: userId,
         review: {
@@ -57,7 +57,7 @@ export const getAllRevision = async (
     console.log({ startOfDay, endOfDay });
 
     log("starting for gettinrevision cached ", startOfDay, endOfDay);
-    const miniTopics = await prisma.learningLog.findMany({
+    const miniTopics = await prisma.learningNote.findMany({
       where: {
         userId: userId,
         review: {

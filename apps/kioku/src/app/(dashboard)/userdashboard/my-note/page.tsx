@@ -26,6 +26,7 @@ export default function MyNote() {
     async function fetchData() {
       try {
         const res = await get_all_learning_Log_stats();
+           
         setData(res.learningLogsWithStats);
       } catch (error) {
         console.log(error);
@@ -33,6 +34,10 @@ export default function MyNote() {
     }
     fetchData();
   }, []);
+
+  useEffect(() => {
+    console.log(data);
+  }, [data]);
 
   return (
     <div className="m-5">

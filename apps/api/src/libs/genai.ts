@@ -1,122 +1,124 @@
 import { GenerativeModel, GoogleGenerativeAI } from "@google/generative-ai";
 import { GoogleGenAI } from "@google/genai";
+import {
+  MAIN_TOPIC_TEST_STRUCTURE_TEMPLATE_LONG_ANSWER,
+  MAIN_TOPIC_TEST_STRUCTURE_TEMPLATE_MCQS,
+  SUB_TOPIC_TEST_STRUCTURE_TEMPLATE_LONG_ANSWER,
+  SUB_TOPIC_TEST_STRUCTURE_TEMPLATE_MCQS,
+} from "../../types/test_structure";
 
 const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_GENAI_API });
-const genai = new GoogleGenerativeAI(`${process.env.GOOGLE_GENAI_API}`);
 
-/* export const testGenerateModel: GenerativeModel = genai.getGenerativeModel({
-  model: "gemini-1.5-flash",
-  systemInstruction:
-    
-});
-
-export const resultGenerateModel: GenerativeModel = genai.getGenerativeModel({
-  model: "gemini-1.5-flash",
-  systemInstruction:
-    "You will receive a question, the correct answer, and the user's answer. Evaluate the user's answer based on clarity, correctness, and logical understanding — it does not need to match the correct answer exactly, as the correct answer may be AI-generated. If the user clearly understood and answered the question well, give 3 stars. If the answer is mostly correct or shows partial understanding, give 2 stars. If it is incorrect or shows poor understanding, give 0 stars. Return a valid JSON object containing the question, a 'rate' field with the number of stars, and a brief summary with advice or corrections for the user's answer. Do not include unnecessary spaces or wrap the result in ```json or any code block.",
-}); */
-
-export async function testGenerateModel(prompt: string) {
-  try {
-    const response = await ai.models.generateContent({
-      model: "gemini-2.0-flash",
-      contents: [
-        {
-          role: "user",
-          parts: [{ text: prompt }],
-        },
-      ],
-      config: {
-        systemInstruction: {
-          parts: [
-            {
-              text: `You are an expert content analyzer. For provided text:
-1. Identify and extract key 2 subtopics only
-2. For each subtopic, generate:
-   -  1 relevant questions
-   - Clear correct answers
-   - Helpful hints
-3. Return as JSON with this exact structure:
-${JSON.stringify({
-  subtopics: [
-    {
-      name: "Subtopic Name",
-      questions: [
-        {
-          question: "Question text",
-          answer: "Correct answer",
-          hint: "Hint text",
-        },
-      ],
-    },
-  ],
-})}
-NO markdown formatting, ONLY valid JSON.`,
-            },
-          ],
-        },
+export const generate_test = async (params: {
+  prompt: string;
+  outputStructure: object;
+  mode: string;
+  difficulty: string;
+}) => {
+  const { prompt, outputStructure,difficulty } = params;
+  const response = await ai.models.generateContent({
+    model: "gemini-2.0-flash",
+    contents: [
+      {
+        role: "user",
+        parts: [{ text: prompt  }],
       },
-    });
+    ],
+    config: {
+      systemInstruction: {
+        parts: [
+          {
+            text: `You are an expert content analyzer. For provided text:
+                    1. Identify and extract key subtopics only
+                    2. Difficultly: ${difficulty}
+                    2. For each subtopic, generate:
+                       - sufficient relevant questions
+                       - Clear correct answers
+                       - Helpful hints
+                    3. Return as JSON with this exact structure:
+                    ${JSON.stringify({ outputStructure })}
+                    NO markdown formatting, ONLY valid JSON.`,
+          },
+        ],
+      },
+    },
+  });
+  console.log("ai callbacke",response);
+  
+  const cleanJson = response && response?.text?.replace(/```json|```/g, "");
+  console.log("clean callbacke",cleanJson );
+  return cleanJson;
+};
 
-    // Extract and parse JSON from response
-    const cleanJson = response && response?.text?.replace(/```json|```/g, "");
-    return cleanJson;
-  } catch (error) {
-    console.error("Generation failed:", error);
-    throw new Error("Content generation failed. Please try again.");
+export class generate_test_model {
+  static async generateTest(params: {
+    prompt: string;
+    mode: string;
+    difficulty: string;
+    isSubTopic: boolean;
+  }) {
+    const { prompt, mode, difficulty, isSubTopic } = params;
+    if (isSubTopic) {
+      return await this.generate_sub_topic_test({ prompt, mode, difficulty });
+    } else {
+      return await this.generate_main_topic_test({ prompt, mode, difficulty });
+    }
   }
-}
+
+  private static async generate_sub_topic_test(params: {
+    prompt: string;
+    mode: string;
+    difficulty: string;
+  }) {
+    const { prompt, mode, difficulty } = params;
+
+    let response;
+    if (mode === "MCQs") {
+      response = await generate_test({
+        prompt,
+        mode,
+        difficulty,
+        outputStructure: SUB_TOPIC_TEST_STRUCTURE_TEMPLATE_MCQS,
+      });
+    } else {
+      response = await generate_test({
+        prompt,
+        mode,
+        difficulty,
+        outputStructure: SUB_TOPIC_TEST_STRUCTURE_TEMPLATE_LONG_ANSWER,
+      });
+    }
+    return response;
+  }
+
+  private static async generate_main_topic_test(params: {
+    prompt: string;
+    mode: string;
+    difficulty: string;
+  }) {
+    const { prompt, mode, difficulty } = params;
+
+    let response;
+    if (mode === "MCQs") {
+      response = await generate_test({
+        prompt,
+        mode,
+        difficulty,
+        outputStructure: MAIN_TOPIC_TEST_STRUCTURE_TEMPLATE_MCQS,
+      });
+    } else {
+      response = await generate_test({
+        prompt,
+        mode,
+        difficulty,
+        outputStructure: MAIN_TOPIC_TEST_STRUCTURE_TEMPLATE_LONG_ANSWER,
+      });
+    }
 
 
-
-export async function subTopicTestGeneration(prompt: string) {
-  try {
-    const response = await ai.models.generateContent({
-      model: "gemini-2.0-flash",
-      contents: [
-        {
-          role: "user",
-          parts: [{ text: prompt }],
-        },
-      ],
-      config: {
-        systemInstruction: {
-          parts: [
-            {
-              text: `You are an expert content analyzer. For provided text:
-1. Identify subTopic i given and extract subtopics content from notes 
-2. For  subtopic, generate:
-   -   relevant questions
-   - Clear correct answers
-   - Helpful hints
-3. Return as JSON with this exact structure:
-${JSON.stringify({
-  subtopics: [
-    {
-      name: "Subtopic Name",
-      questions: [
-        {
-          question: "Question text",
-          answer: "Correct answer",
-          hint: "Hint text",
-        },
-      ],
-    },
-  ],
-})}
-NO markdown formatting, ONLY valid JSON.`,
-            },
-          ],
-        },
-      },
-    });
-
-    // Extract and parse JSON from response
-    const cleanJson = response && response?.text?.replace(/```json|```/g, "");
-    return cleanJson;
-  } catch (error) {
-    console.error("Generation failed:", error);
-    throw new Error("Content generation failed. Please try again.");
+    console.log("final test generated ",response);
+    
+    return response;
   }
 }
 

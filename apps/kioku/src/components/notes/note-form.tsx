@@ -24,6 +24,7 @@ export default function NoteForm({
   isSubmitting: boolean;
   onSubmit: () => void;
 }) {
+
   function handleSubmit() {
     setNotes(notes);
     onSubmit();
@@ -66,7 +67,10 @@ export default function NoteForm({
           <Label className="font-medium ">Notes</Label>
         </div>
         <ScrollArea className=" w-full  scrollbar-none ">
-          <TailwindAdvancedEditor value={notes} onChange={setNotes} />
+          <TailwindAdvancedEditor value={notes} onChange={(content) => {
+            console.log("Editor onChange called with:", content);
+            setNotes(content);
+          }} />
         </ScrollArea>
       </div>
 

@@ -1,4 +1,4 @@
-"use client";
+'use client';
 import {
   SignInButton,
   SignUpButton,
@@ -6,18 +6,37 @@ import {
   SignedOut,
   UserButton,
   useUser,
-} from "@clerk/nextjs";
-import { usePathname, useRouter } from "next/navigation";
-import { ButtonColorful } from "./ui/button-colorful";
-import Link from "next/link";
+} from '@clerk/nextjs';
+import { usePathname, useRouter } from 'next/navigation';
+import { ButtonColorful } from './ui/button-colorful';
+import Link from 'next/link';
+import { useEffect } from 'react';
+import { signIn } from '@/app/actions/auth';
 
 export default function Navbar() {
   const { isSignedIn, user, isLoaded } = useUser();
   const pathName = usePathname();
   const router = useRouter();
 
+  useEffect(() => {
+    if (isLoaded && isSignedIn && user) {
+      const createUser = async () => {
+        try {
+          console.log('Calling signIn action...');
+          await signIn({
+            email: user.emailAddresses[0]?.emailAddress || '',
+            name: user.fullName || '',
+            imgUrl: user.imageUrl || '',
+            userId: user.id,
+          });
+        } catch (error) {
+          console.error('Error creating user:', error);
+        }
+      };
 
-
+      createUser();
+    }
+  }, []);
 
   if (!isLoaded) {
     return (
@@ -34,24 +53,18 @@ export default function Navbar() {
     <div className="fixed top-0 left-0 w-full h-16  bg-opacity-90 backdrop-blur-sm text-white shadow-lg z-50">
       <div className=" mx-auto h-full flex items-center justify-between px-6 md:px-8 lg:px-12">
         <h1
-          onClick={() => router.push("/")}
+          onClick={() => router.push('/')}
           className="text-4xl  md:text-3xl font-bold tracking-tight bg-gradient-to-r from-indigo-400 to-purple-500 bg-clip-text text-transparent cursor-pointer"
         >
           Kioko
         </h1>
 
         <div className="flex items-center gap-6">
-          {pathName === "/" && (
+          {pathName === '/' && (
             <div className="hidden md:flex items-center gap-8 text-base font-medium ">
-              <button className="hover:text-white  transition-colors">
-                Product
-              </button>
-              <button className="hover:text-white  transition-colors">
-                How it works
-              </button>
-              <button className="hover:text-white  transition-colors">
-                Testimonials
-              </button>
+              <button className="hover:text-white  transition-colors">Product</button>
+              <button className="hover:text-white  transition-colors">How it works</button>
+              <button className="hover:text-white  transition-colors">Testimonials</button>
             </div>
           )}
 
@@ -69,13 +82,10 @@ export default function Navbar() {
               </SignUpButton>
             </SignedOut>
 
-            {pathName === "/" && isSignedIn ? (
+            {pathName === '/' && isSignedIn ? (
               <Link href="/userdashboard">
                 <div className="flex cursor-pointer items-center gap-2">
-                  <ButtonColorful
-                    className="rounded-4xl cursor-pointer"
-                    label="Dashboard"
-                  />
+                  <ButtonColorful className="rounded-4xl cursor-pointer" label="Dashboard" />
                 </div>
               </Link>
             ) : (
@@ -83,7 +93,7 @@ export default function Navbar() {
                 <UserButton
                   appearance={{
                     elements: {
-                      userButtonAvatarBox: "w-12 h-12 ",
+                      userButtonAvatarBox: 'w-12 h-12 ',
                     },
                   }}
                 />
