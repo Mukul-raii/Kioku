@@ -14,45 +14,72 @@ datasource db {
 }
 
 model User {
-  id          Int           @id @default(autoincrement())
+  id          Int            @id @default(autoincrement())
   name        String
-  userId      String        @unique
-  email       String        @unique
+  userId      String         @unique
+  email       String         @unique
   imageUrl    String?
-  learningLog LearningLog[]
+  learningLog LearningNote[]
   category    Category[]
+  customTest  CustomTest[]
+  review      Review[]
+  createdDate DateTime       @default(now())
+  updatedDate DateTime       @updatedAt
 }
 
 model Category {
-  id            Int           @id @default(autoincrement()) // Primary key
-  catergoryName String // Name of the category
-  user          User          @relation(fields: [userId], references: [userId]) // Relation to User
+  id            Int            @id @default(autoincrement()) // Primary key
+  user          User           @relation(fields: [userId], references: [userId]) // Relation to User
   userId        String // Foreign key for User
-  learningLogs  LearningLog[] // Relation to LearningLog
-  createdDate   DateTime      @default(now()) // Automatically set creation date
+  catergoryName String // Name of the category
+  learningLogs  LearningNote[] // Relation to LearningLog
+  createdDate   DateTime       @default(now()) // Automatically set creation date
+  customTest    CustomTest[]
 }
 
-model LearningLog {
+model LearningNote {
   id          Int       @id @default(autoincrement())
   user        User      @relation(fields: [userId], references: [userId])
   userId      String
-  date        DateTime
   topic       String
   //category    Category @relation(fields: [categoryId], references: [id])
   // categoryId  Int
   category    String
   notes       String
-  review      Review[]
-  createdDate DateTime  @updatedAt
+  review      Review[]  @relation("LearningNoteReviews")
+  updateDate  DateTime  @updatedAt()
+  createdDate DateTime  @default(now())
+  Category    Category? @relation(fields: [categoryId], references: [id])
+  categoryId  Int?
+}
+
+model CustomTest {
+  id          Int       @id @default(autoincrement())
+  user        User      @relation(fields: [userId], references: [userId])
+  userId      String
+  topic       String
+  //category    Category @relation(fields: [categoryId], references: [id])
+  // categoryId  Int
+  category    String
+  notes       String
+  review      Review[]  @relation("CustomTestReviews")
+  updateDate  DateTime  @updatedAt()
+  createdDate DateTime  @default(now())
   Category    Category? @relation(fields: [categoryId], references: [id])
   categoryId  Int?
 }
 
 model Review {
-  id          Int           @id @default(autoincrement())
-  learningLog LearningLog   @relation(fields: [logId], references: [id])
-  logId       Int
-  createdDate DateTime      @updatedAt
+  id        Int      @id @default(autoincrement())
+  logId     Int?
+  testId    Int?
+  userId    String
+  updatedAt DateTime @updatedAt()
+  createdAt DateTime @default(now())
+
+  user        User          @relation(fields: [userId], references: [userId])
+  learningLog LearningNote? @relation("LearningNoteReviews", fields: [logId], references: [id])
+  customTest  CustomTest?   @relation("CustomTestReviews", fields: [testId], references: [id])
   testResult  TestResults[]
 }
 
@@ -68,5 +95,3 @@ model TestResults {
   nextReviewDate  DateTime
   lastReviewed    DateTime @updatedAt
 }
-
-

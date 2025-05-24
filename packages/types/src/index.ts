@@ -1,12 +1,16 @@
 // src/index.ts
 export * from "./userAuth.types";
 export * from "./notes.types";
+import z from 'zod'
 
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-}
+
+export const userSchema=z.object({
+  id:z.string(),
+  name:z.string(),
+  email:z.string().regex(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/),
+})
+
+export type User = z.infer<typeof userSchema>
 
 export interface Red {
   id: string;

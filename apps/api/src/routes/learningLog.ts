@@ -6,7 +6,6 @@ import {
   generate_a_Result_New_Topic,
   generate_a_Result_Sub_Topic,
   generate_a_Test,
-  get_notion_Notes,
   getAllLearningLogs,
   getLearningLogStats,
 } from "../controllers/learningLog.controller";

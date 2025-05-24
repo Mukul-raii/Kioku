@@ -2,7 +2,7 @@
   "extends": [
     "//"
   ],
-  "pipeline": {
+  "tasks": {
     "build": {
       "dependsOn": [
         "^build"
@@ -13,6 +13,6 @@
       "env": [
         "PORT"
       ]
-    },
+    }
   }
 }

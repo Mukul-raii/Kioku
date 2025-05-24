@@ -1,6 +1,10 @@
-export type userDetails = {
-    email: string;
-    imgUrl: string;
-    name: string;
-    userId: string;
-};
+import { z } from "zod";
+
+export const userAuthSchema = z.object({
+    email: z.string().email(),
+    imgUrl: z.string(),
+    name: z.string(),
+    userId: z.string(),
+})
+
+export type userAuth = z.infer<typeof userAuthSchema>

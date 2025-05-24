@@ -36,12 +36,11 @@ console.log(typeof(date));
 
     return;
   }
-  const newLearningLog = await prisma.learningLog.create({
+  const newLearningLog = await prisma.learningNote.create({
     data: {
       userId: user,
       topic,
       notes,
-      date,
       category,
     },
   });
@@ -71,7 +70,7 @@ export const getLearningLogStats = async (
     return
   }
 
-  const learningLogs = await prisma.learningLog.findMany({
+  const learningLogs = await prisma.learningNote.findMany({
     where: { userId },
     include: {
       review: {
@@ -127,7 +126,7 @@ export const updateLearningLog = async (
     return;
   }
 
-  const learningLog = await prisma.learningLog.update({
+  const learningLog = await prisma.learningNote.update({
     where: {
       id: parseInt(logId),
     },
@@ -158,7 +157,7 @@ export const getAllLearningLogs = async (
     })
   }
 
-  const learningLogs = await prisma.learningLog.findMany({
+  const learningLogs = await prisma.learningNote.findMany({
     where: { userId },
   });
 
@@ -182,7 +181,7 @@ export const deleteLearningLog = async (
     return
   }
 
-  const learningLog = await prisma.learningLog.delete({
+  const learningLog = await prisma.learningNote.delete({
     where: {
       id: parseInt(id),
     },
@@ -210,7 +209,7 @@ export const generate_a_Test = async (
   }
 
   if (parseInt(isSubTopic) !== 0) {
-    const learningLog = await prisma.learningLog.findMany({
+    const learningLog = await prisma.learningNote.findMany({
       where: {
         id: parseInt(id),
       },
@@ -243,7 +242,7 @@ export const generate_a_Test = async (
       test: test,
     });
   } else {
-    const learningLog = await prisma.learningLog.findUnique({
+    const learningLog = await prisma.learningNote.findUnique({
       where: {
         id: parseInt(id),
       },

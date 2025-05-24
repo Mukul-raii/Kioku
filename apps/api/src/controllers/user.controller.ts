@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
+import {userAuthSchema,userAuth} from '@repo/types'
 
 const prisma = new PrismaClient();
 
@@ -7,8 +8,8 @@ export const createNewUser = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  const { email, name, imgUrl, userId } = req.body;
-
+  const { email, name, imgUrl, userId }:userAuth = req.body;
+  
   if (!email || !name || !imgUrl || !userId) {
     res.status(400).json({
       message: "All fields are required",

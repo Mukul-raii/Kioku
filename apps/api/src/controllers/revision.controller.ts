@@ -108,7 +108,7 @@ export const getProgress = async (
   try {
     const { userId } = req.query as { userId: string };
 
-    const learningLogs = await prisma.learningLog.findMany({
+ const learningLogs = await prisma.learningNote.findMany({
       where: { userId },
       include: {
         review: {
@@ -225,7 +225,7 @@ export const getProgress = async (
       const next = new Date(entry.nextReviewDate);
       return next < today && new Date(entry.lastReviewed) < next;
     });
-
+   
     res.status(200).json({
       message: "Progress analytics fetched successfully",
       retention,
