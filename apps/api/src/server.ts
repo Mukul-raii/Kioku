@@ -8,6 +8,7 @@ import "./libs/redis";
 import Review from "./routes/review";
 import { clerkMiddleware } from "@clerk/express";
 import { errrorHandler } from "./libs/asyncHandler";
+import { main } from "./query.test";
 
 const app = express();
 
@@ -28,7 +29,7 @@ app.use("/api/v1/learningLog", LearningLog);
 app.use("/api/v1/review", Review);
 app.use("/api/v1/quick_test",QuickTest );
 
-
+main()
 
 app.use(errrorHandler);
 

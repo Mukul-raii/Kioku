@@ -4,7 +4,7 @@ import { Request, Response } from "express";
 import redis from "../libs/redis";
 const prisma = new PrismaClient();
 const mockDate = new Date();
-mockDate.setDate(mockDate.getDate() + 0); // Move to next day
+mockDate.setDate(mockDate.getDate() + 1); // Move to next day
 
 const OriginalDate = Date;
 global.Date = class extends OriginalDate {
@@ -29,7 +29,7 @@ export const getAllRevision = async (
     const cachedTopics = await redis.get(`topics:${userId}`);
     const cachedMiniTopics = await redis.get(`miniTopics:${userId}`);
 
-   /*    if(cachedTopics && cachedMiniTopics){
+    /*    if(cachedTopics && cachedMiniTopics){
        res.status(200).json({
         message: "Revision Fetched Successfully",
         topics: JSON.parse(cachedTopics),
@@ -37,7 +37,7 @@ export const getAllRevision = async (
       });
       return;
      } */
-     
+
     const topics = await prisma.learningNote.findMany({
       where: {
         userId: userId,
@@ -108,7 +108,7 @@ export const getProgress = async (
   try {
     const { userId } = req.query as { userId: string };
 
- const learningLogs = await prisma.learningNote.findMany({
+    const learningLogs = await prisma.learningNote.findMany({
       where: { userId },
       include: {
         review: {
@@ -225,7 +225,7 @@ export const getProgress = async (
       const next = new Date(entry.nextReviewDate);
       return next < today && new Date(entry.lastReviewed) < next;
     });
-   
+
     res.status(200).json({
       message: "Progress analytics fetched successfully",
       retention,

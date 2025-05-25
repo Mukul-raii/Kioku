@@ -1,8 +1,14 @@
 "use client";
 import { getAllRevision } from "@/app/actions/quick-review";
-import { createQuickTest } from "@/app/actions/quick-test";
 import { useUser } from "@clerk/nextjs";
-import { memo, useCallback, useEffect, useState } from "react";
+import {
+  memo,
+  Suspense,
+  useCallback,
+  useEffect,
+  useReducer,
+  useState,
+} from "react";
 import { Clock, Brain } from "lucide-react";
 import { Badge } from "../ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
@@ -15,90 +21,83 @@ import {
 } from "@/components/ui/select";
 import { ReviewListLoader } from "./reviewLIstLoader";
 import { ReviewCard, NoDataCard } from "./reviewCard";
-import {
-  GroupedNotes,
-  quickTestSchema,
-  SubTopicAggregate,
-  TopicsForRevision,
-} from "@repo/types";
+import { SubTopicAggregate, TopicsForRevision } from "@repo/types";
 import { Button } from "../ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
-import { Input } from "../ui/input";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "../ui/form";
+import { get_a_test } from "@/app/actions/learning-log";
+import TestDialog from "./test";
+import QuickTestForm from "./quicktesForm";
+import { initialReviewListState, reviewListReducers } from "@/service/testHook";
 
-export const ReviewList = memo(function ReviewList({
-  reviewToLog,
-  isSubTopic,
-  showNotes,
-}: any) {
+export const ReviewList = memo(function ReviewList({ showNotes }: any) {
   const { user } = useUser();
-  const [data, setData] = useState<GroupedNotes>({
-    message: "",
-    topics: [],
-    miniTopics: [],
-  });
-  const [loading, setLoading] = useState(true);
-  const [subTopicRevision, setSubTopicRevision] = useState<SubTopicAggregate[]>(
-    []
+  const [state, dispatch] = useReducer(
+    reviewListReducers,
+    initialReviewListState
   );
-  const [activeTab, setActiveTab] = useState("topics");
-  const [filterCategory, setFilterCategory] = useState("all");
-  const [isQuickTest, setIsQuickTest] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const {
+    data,
+    subTopicRevision,
+    loading,
+    activeTab,
+    filterCategory,
+    reviewToLog,
+    isSubTopic,
+    allQuestionsData,
+    testData,
+    isDialogOpen,
+    isQuickTest,
+  } = state;
 
-  const form = useForm<z.infer<typeof quickTestSchema>>({
-    resolver: zodResolver(quickTestSchema),
-    defaultValues: {
-      category: "",
-      topic: "",
-    },
-  });
+  const setActiveTab = useCallback((tab: string) => {
+    dispatch({ type: "SET_ACTIVE_TAB", payload: tab });
+  }, []);
 
-  const onQuickTestSubmit = async (values: z.infer<typeof quickTestSchema>) => {
-    try {
-      setIsSubmitting(true);
-      console.log("Creating quick test with:", values);
+  const setFilterCategory = useCallback((category: string) => {
+    dispatch({ type: "SET_FILTER_CATEGORY", payload: category });
+  }, []);
 
-      const result = await createQuickTest(values);
+  const setReviewToLog = useCallback((id: number) => {
+    dispatch({ type: "SET_REVIEW_TO_LOG", payload: id });
+    dispatch({ type: "SET_DIALOG_OPEN", payload: true });
+  }, []);
 
-      if (result.success) {
-        console.log("Test created successfully:", result.data);
-        setIsQuickTest(false);
-        form.reset();
-      }
-    } catch (error) {
-      console.error("Error creating quick test:", error);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+  const setIsQuickTest = useCallback((open: boolean) => {
+    dispatch({ type: "SET_QUICK_TEST", payload: open });
+  }, []);
 
   useEffect(() => {
-    const isMounted = true;
-    if (!user) return;
+    console.log("fetching test data");
+    if (!reviewToLog) return;
+    async function fetchTestData() {
+      try {
+        const res = await get_a_test(reviewToLog, isSubTopic);
+        const data = JSON.parse(res);
+        dispatch({
+          type: "SET_TEST_DATA",
+          payload: {
+            testData: data.outputStructure,
+          },
+        });
+      } catch (error) {
+        console.error(`Falied to fetch test data`,error);
+      }
+    }
+    fetchTestData();
+  }, [reviewToLog, isSubTopic]);
+
+  useEffect(() => {
+    if (!user?.id) return;
 
     async function fetchData() {
       try {
-        setLoading(true);
+        dispatch({ type: "SET_LOADING", payload: true });
         const res = await getAllRevision(user?.id || "");
-        console.log("data received ", res);
 
-        if (isMounted) setData(res);
+        dispatch({ type: "SET_DATA", payload: res });
 
         const subtopic: SubTopicAggregate[] = res.miniTopics
           .flatMap(
             (subitem) =>
-              // For each miniTopic, either flatten or return an empty array
               subitem.review?.flatMap((test) =>
                 test.testResult?.map((q) => ({
                   test: test.logId,
@@ -111,21 +110,14 @@ export const ReviewList = memo(function ReviewList({
               ) ?? []
           )
           .filter((item): item is SubTopicAggregate => item !== undefined);
-
-        setSubTopicRevision(subtopic);
+        dispatch({ type: "SET_SUBTOPIC_REVISION", payload: subtopic });
       } catch (error) {
         console.error("Error fetching revision data:", error);
       } finally {
-        setLoading(false);
-        if (isMounted) {
-          setLoading(false);
-        }
+        dispatch({ type: "SET_LOADING", payload: false });
       }
     }
-
-    if (user?.id) {
-      fetchData();
-    }
+    fetchData();
   }, [user]);
 
   // Filter categories function
@@ -228,7 +220,7 @@ export const ReviewList = memo(function ReviewList({
                   <ReviewCard
                     key={item.id}
                     item={item}
-                    setReview={reviewToLog}
+                    setReview={setReviewToLog}
                     setNotesId={showNotes}
                   />
                 )
@@ -250,10 +242,12 @@ export const ReviewList = memo(function ReviewList({
                   <ReviewCard
                     key={item.id}
                     item={item}
-                    setReview={reviewToLog}
+                    setReview={setReviewToLog}
                     setNotesId={showNotes}
                     isSubtopic={true}
-                    setSubTopicId={isSubTopic}
+                    setSubTopicId={(value: number) =>
+                      dispatch({ type: "SET_IS_SUBTOPIC", payload: value })
+                    }
                   />
                 )
               )}
@@ -261,122 +255,27 @@ export const ReviewList = memo(function ReviewList({
           )}
         </TabsContent>
       </Tabs>
-
-        <Dialog open={isQuickTest} onOpenChange={() => setIsQuickTest(false)}>
-          <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader>
-              <DialogTitle>Create a Quick Test</DialogTitle>
-            </DialogHeader>
-            <Form {...form}>
-              <form
-                onSubmit={form.handleSubmit(onQuickTestSubmit)}
-                className="space-y-4"
-              >
-                <FormField
-                  control={form.control}
-                  name="category"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Category</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Enter category" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="topic"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Topic</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Enter topic" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="difficulty"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Difficulty</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        value={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select difficulty" />
-                          </SelectTrigger>
-                        </FormControl>
-                              <SelectContent 
-          className="z-[9999]"
-          position="popper"
-          side="bottom"
-          align="start"
-        >
-                          <SelectItem value="easy">Easy</SelectItem>
-                          <SelectItem value="medium">Medium</SelectItem>
-                          <SelectItem value="hard">Hard</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="mode"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Test Mode</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value} >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select test mode" />
-                          </SelectTrigger>
-                        </FormControl>
-                             <SelectContent 
-          className="z-[9999]"
-          position="popper"
-          side="bottom"
-          align="start"
-        >
-                          <SelectItem value="mcq">Multiple Choice</SelectItem>
-                          <SelectItem value="long_answer">
-                            Long Answer
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <div className="flex justify-end space-x-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setIsQuickTest(false)}
-                    disabled={isSubmitting}
-                  >
-                    Cancel
-                  </Button>
-                  <Button type="submit" disabled={isSubmitting}>
-                    {isSubmitting ? "Creating..." : "Create Test"}
-                  </Button>
-                </div>
-              </form>
-            </Form>
-          </DialogContent>
-        </Dialog>
+      {
+        <QuickTestForm
+          open={isQuickTest}
+          onChange={setIsQuickTest}
+          setQuickTest={() =>
+            dispatch({ type: "SET_QUICK_TEST", payload: true })
+          }
+        />
+      }
+      {isDialogOpen && testData  && (
+        <Suspense fallback={<div>Loading....</div>}>
+          <TestDialog
+            dialogOpen={isDialogOpen}
+            setDialogOpen={() =>
+              dispatch({ type: "SET_DIALOG_OPEN", payload: false })
+            }
+            testData={testData}
+            mode={"quick"}
+          />
+        </Suspense>
+      )}
     </div>
   );
 });

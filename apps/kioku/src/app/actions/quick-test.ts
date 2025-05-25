@@ -30,12 +30,11 @@ export const createQuickTest = async (params: QuickTestParams) => {
     );
 
 
-    console.log(learningLogResponse);
     
     return {
       success: true,
-      data: {
-      },
+      data: learningLogResponse.data, // Extract only the data
+      status: learningLogResponse.status, 
     };
   } catch (error) {
     console.error("Error creating quick test:", error);

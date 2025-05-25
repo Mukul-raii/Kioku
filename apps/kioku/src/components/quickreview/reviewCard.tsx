@@ -23,7 +23,9 @@ export const ReviewCard = memo(function ReviewCard({
   setNotesId,
 }: any) {
   function handleTopicReview(id: number) {
+    console.log('set id ',id);
     setReview(id);
+
   }
 
   function handleSubTopicReview(id: number, test) {

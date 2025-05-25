@@ -88,7 +88,7 @@ export const quickTestSchema = z.object({
     difficulty: z.enum(["easy", "medium", "hard"], {
       required_error: "Please select a difficulty level",
     }),
-    mode: z.enum(["mcq", "long_answer"], {
+    mode: z.enum(["MCQs", "long_answer"], {
       required_error: "Please select a test mode",
     }),
   });

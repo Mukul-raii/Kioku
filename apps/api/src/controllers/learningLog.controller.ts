@@ -1,18 +1,17 @@
 import { Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
-import {resultGenerateModel} from "../libs/genai";
+import { generate_test_model, resultGenerateModel } from "../libs/genai";
 import redis from "../libs/redis";
 import { zodValidation, sendResponse, sendError } from "../libs/asyncHandler";
 import { newNoteSchema } from "@repo/types";
-import { generate_a_new_Test } from "../service/test.service";
+import { LearningLogTestService } from "../service/test.service";
 const prisma = new PrismaClient();
-
 
 export const createNewLearningLog = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  console.log("userid chechking ",req.auth)
+  console.log("userid chechking ", req.auth);
   const userId = req.auth.userId;
   const { notes, topic, category } = req.body;
 
@@ -21,7 +20,7 @@ export const createNewLearningLog = async (
     return;
   }
   const validate = zodValidation(newNoteSchema, req.body);
-  
+
   if (!validate.success) {
     sendError(res, 400, "Validation failed", validate.error?.errors);
     return;
@@ -56,7 +55,9 @@ export const getLearningLogStats = async (
 
   try {
     const cachedLearningLogs = await redis.get(`learningLogs:${userId}`);
-    const cachedLearningLogsStats = await redis.get(`learningLogsStats:${userId}`);
+    const cachedLearningLogsStats = await redis.get(
+      `learningLogsStats:${userId}`
+    );
 
     if (cachedLearningLogs && cachedLearningLogsStats) {
       sendResponse(res, 200, "Learning Logs Fetched Successfully", {
@@ -235,12 +236,12 @@ export const generate_a_Test = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  console.log("generate a test",req.params)
+  console.log("generate a test", req.params);
   const userId = req.auth.userId;
-  const { id, isSubTopic } = req.params
-  const {mode , difficulty}: {mode:string,difficulty:string} = req.body 
-  console.log(userId,id,isSubTopic);
-  
+  const { id, isSubTopic } = req.params;
+  const { mode, difficulty }: { mode: string; difficulty: string } = req.body;
+  console.log(userId, id, isSubTopic);
+
   if (!userId) {
     sendError(res, 401, "Unauthorized - User ID not found");
     return;
@@ -252,19 +253,21 @@ export const generate_a_Test = async (
   }
 
   try {
-      const get_a_new_test = await generate_a_new_Test.generateTest({
-        learningLogId:parseInt(id),
-        subTopicId:isSubTopic === "1" ? parseInt(id): undefined,
-        mode:"Long",
-        userId,
-        difficulty:"HARD",
-      })
+    const get_a_new_test = await LearningLogTestService.generateTest({
+      learningLogId: parseInt(id),
+      subTopicId: isSubTopic === "1" ? parseInt(id) : undefined,
+      mode: "MCQs",
+      userId,
+      difficulty: "HARD",
+    });
+    console.log(get_a_new_test);
+    
 
     sendResponse(res, 200, "Test Generated Successfully", { get_a_new_test });
   } catch (error) {
     sendError(res, 500, "Failed to generate test", error);
   }
-}
+};
 
 export const check_The_Result = async (
   req: Request,
@@ -306,7 +309,7 @@ export const generate_a_Result_New_Topic = async (
 ): Promise<void> => {
   const { id, result } = req.body; //learning log id
 
- /* 
+  /* 
   const reviewGenerate = await prisma.review.create({
     data: {
       logId: id,
@@ -321,7 +324,7 @@ export const generate_a_Result_New_Topic = async (
           ),
         },
     ))}; */
-}
+};
 
 export const generate_a_Result_Sub_Topic = async (
   req: Request,
@@ -341,8 +344,7 @@ export const generate_a_Result_Sub_Topic = async (
   }
 
   try {
- 
-/*     const reviewGenerate = await prisma.testResults.update({
+    /*     const reviewGenerate = await prisma.testResults.update({
       where: {
         id: id,
       },
@@ -376,11 +378,7 @@ export const generate_a_quick_test = async (
   }
 
   try {
-    
-  
   } catch (error) {
     sendError(res, 500, "Failed to generate quick test", error);
   }
 };
-
-

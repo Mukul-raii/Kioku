@@ -1,6 +1,7 @@
 // src/index.ts
 export * from "./userAuth.types";
 export * from "./notes.types";
+export * from "./reviewList"
 import z from 'zod'
 
 

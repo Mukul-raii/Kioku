@@ -43,10 +43,7 @@ export const generate_test = async (params: {
       },
     },
   });
-  console.log("ai callbacke",response);
-  
   const cleanJson = response && response?.text?.replace(/```json|```/g, "");
-  console.log("clean callbacke",cleanJson );
   return cleanJson;
 };
 
@@ -63,6 +60,32 @@ export class generate_test_model {
     } else {
       return await this.generate_main_topic_test({ prompt, mode, difficulty });
     }
+  }
+
+  static async generateQuizTest(params:{
+    prompt: string;
+    mode: string;
+    difficulty: string;
+  }){
+    const { prompt, mode, difficulty } = params;
+    console.log(prompt,mode,difficulty)
+    let response;
+    if (mode === "MCQs") {
+      response = await generate_test({
+        prompt,
+        mode,
+        difficulty,
+        outputStructure: MAIN_TOPIC_TEST_STRUCTURE_TEMPLATE_MCQS,
+      });
+    } else {
+      response = await generate_test({
+        prompt,
+        mode,
+        difficulty,
+        outputStructure: MAIN_TOPIC_TEST_STRUCTURE_TEMPLATE_LONG_ANSWER,
+      });
+    }
+    return response;
   }
 
   private static async generate_sub_topic_test(params: {
