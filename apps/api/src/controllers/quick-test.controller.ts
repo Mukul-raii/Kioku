@@ -15,7 +15,7 @@ export const new_quick_test = async (
     sendError(res, 400, validate.error.message);
     return;
   }
-  const { topic, category,mode } = req.body;
+  const { topic, category, mode } = req.body;
   const userId = req.auth.userId;
 
   if (!userId) {
@@ -37,16 +37,15 @@ export const new_quick_test = async (
       sendResponse(res, 500, "Failed to create quick test");
       return;
     }
-    const get_a_new_test =
-      await QuickTestGenerationService.BuildBasicQuickTest({
+    const get_a_new_test = await QuickTestGenerationService.BuildBasicQuickTest(
+      {
         topic,
         category,
         mode,
         userId,
         difficulty: "HARD",
-      });
-      console.log("quick dest data ",get_a_new_test,JSON.parse(get_a_new_test));
-      
+      }
+    );
 
     sendResponse(res, 200, "Quick Test Created Successfully", get_a_new_test);
     return;

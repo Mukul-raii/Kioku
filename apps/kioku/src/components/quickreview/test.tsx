@@ -18,32 +18,41 @@ import { CheckCircle2 } from "lucide-react";
 import { useState } from "react";
 import { Answered } from "@repo/types";
 import { Checkbox } from "../ui/checkbox";
+import { check_test_result } from "@/app/actions/learning-log";
 
+interface testDialogProps {
+  dialogOpen: boolean;
+  setDialogOpen: (open: boolean) => void;
+  testData: any;
+  mode: any;
+}
 //common types testdata , qustion is answer is changing so we can
 export default function TestDialog({
   dialogOpen,
   setDialogOpen,
   testData,
   mode,
-}) {
+}: testDialogProps) {
   const [showHint, setShowHint] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answer, setAnswer] = useState("");
   const [allAnswers, setAllAnswers] = useState<Answered[]>([]);
-
+  const [answerRating, setAnswerRating] = useState("");
+  const [checkResultDialogOpen, setCheckResultDialogOpen] = useState(false);
+  const [checkResultData, setCheckResultData] = useState<any>(null);
   const structure = testData?.structure;
   const testType = testData?.testType;
   const format = testData?.format;
 
   const allQuestions =
-    structure?.subtopics?.flatMap((sub) => sub.questions) || [];
+    structure?.subtopics?.flatMap((sub: any) => sub.questions) || [];
 
   const currentQuestion = allQuestions[currentIndex];
   const totalQuestions = allQuestions.length;
   console.log(currentQuestion);
 
-  function handleNextQuestion() {
+  async function handleNextQuestion() {
     console.log({ currentIndex, totalQuestions });
 
     if (currentIndex <= totalQuestions - 1) {
@@ -65,7 +74,8 @@ export default function TestDialog({
       setCheckResultDialogOpen(false);
     }
     if (currentIndex > totalQuestions - 1) {
-      const res = getResult();
+      const res = await checkTheAnswer();
+      console.log(res);
     }
   }
 
@@ -84,8 +94,8 @@ export default function TestDialog({
     setIsSubmitting(true);
     try {
       const res = await check_test_result({
-        question: currentQuestion?.question || "",
-        correctAnswer: currentQuestion?.answer || "",
+        question: currentQuestion?.question ,
+        correctAnswer: currentQuestion?.answer ||currentQuestion?.correctAnswer,
         userAnswer: answer,
       });
 
@@ -172,7 +182,7 @@ export default function TestDialog({
               {
                 <Button
                   variant="outline"
-                  onClick={() => getResult()}
+                  onClick={() => checkTheAnswer()}
                   disabled={showHint}
                   className="flex gap-2"
                 >
@@ -203,7 +213,7 @@ export default function TestDialog({
   );
 }
 
-function LongQuestion({ answer, setAnswer }) {
+function LongQuestion({ answer, setAnswer }: { answer: any; setAnswer: any }) {
   return (
     <div className="space-y-2">
       <Label htmlFor="answer" className="text-base">
@@ -220,8 +230,13 @@ function LongQuestion({ answer, setAnswer }) {
   );
 }
 
-function MCQsQuestion({ options, setAnswer }) {
-  console.log(options);
+function MCQsQuestion({
+  options,
+  setAnswer,
+}: {
+  options: any;
+  setAnswer: any;
+}) {
 
   return (
     <div className="space-y-2 ">

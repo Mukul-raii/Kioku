@@ -1,31 +1,30 @@
 import { ReviewListAction, ReviewListState } from "@repo/types";
 import { useReducedMotion } from "framer-motion";
 
-
 export const initialReviewListState: ReviewListState = {
   data: {
     message: "",
     topics: [],
-    miniTopics: []
+    miniTopics: [],
   },
   subTopicRevision: [],
   loading: true,
   activeTab: "topics",
   filterCategory: "all",
   reviewToLog: 0,
+  reviewType: "Long",
+  reviewDifficulty: "Easy",
   isSubTopic: 0,
   allQuestionsData: null,
   testData: null,
   isDialogOpen: false,
-  isQuickTest: false
+  isQuickTest: false,
 };
-
 
 export const reviewListReducers = (
   state: ReviewListState,
   action: ReviewListAction
 ): ReviewListState => {
-    
   switch (action.type) {
     case "SET_LOADING":
       return { ...state, loading: action.payload };
@@ -44,6 +43,11 @@ export const reviewListReducers = (
 
     case "SET_REVIEW_TO_LOG":
       return { ...state, reviewToLog: action.payload };
+
+    case "SET_REVIEW_TYPE":
+      return { ...state, reviewType: action.payload };
+    case "SET_REVIEW_DIFFICULTY":
+      return { ...state, reviewDifficulty: action.payload };
 
     case "SET_IS_SUBTOPIC":
       return { ...state, isSubTopic: action.payload };
@@ -66,6 +70,8 @@ export const reviewListReducers = (
       return {
         ...state,
         reviewToLog: 0,
+        reviewType: "Long",
+        reviewDifficulty: "Easy",
         isSubTopic: 0,
         allQuestionsData: null,
         testData: null,

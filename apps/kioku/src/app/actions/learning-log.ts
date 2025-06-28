@@ -26,11 +26,11 @@ export const get_all_learning_Log_stats =
 export const newLearningLogs = async (data: New_Learning_Log) => {
   const { getToken } = await auth();
   const token = await getToken();
-  console.log("data frontend",data);
-  
+  console.log("data frontend", data);
+
   const response = await axios.post(
     `${process.env.NEXT_PUBLIC_BACKEND_API}/learningLog/new_learning_log`,
-    data ,
+    data,
     {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -63,22 +63,22 @@ export const check_test_result = async ({
   return response.data.test;
 };
 
-export const get_a_test = async (id: number, isSubtopic: number) => {
+export const get_a_test = async (id: number, isSubtopic: number,reviewType:string,reviewDifficulty:string) => {
   const { getToken } = await auth();
   const token = await getToken();
+ 
   const response = await axios.post(
     `${process.env.NEXT_PUBLIC_BACKEND_API}/learningLog/get_a_test/${id}/${isSubtopic}`,
     {
-      mode:"MCQs",
-      difficulty: "HARD"
+      mode: reviewType,
+      difficulty: reviewDifficulty,
     },
     {
       headers: { Authorization: `Bearer ${token}` },
     }
   );
-  
+
   return response.data.data.get_a_new_test;
-  
 };
 
 export const get_a_test_result = async (id: number, result) => {

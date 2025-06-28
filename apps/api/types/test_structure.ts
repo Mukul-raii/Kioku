@@ -98,7 +98,7 @@ export const SUB_TOPIC_TEST_STRUCTURE_TEMPLATE_MCQS = {
         {
           id: "string - Unique question identifier",
           question: "string - The multiple choice question text",
-          type: "mcq",
+          type: "mcq_Correct_option_text [NOT the Option]",
           options: [
             "string - Option A text",
             "string - Option B text",
@@ -143,7 +143,7 @@ export const MAIN_TOPIC_TEST_STRUCTURE_TEMPLATE_MCQS = {
           {
             id: "string - Unique question identifier",
             question: "string - The multiple choice question text",
-            type: "mcq",
+            type: "mcq_Correct_option_Answer [NOT the Option]",
             options: [
               "string - Option A text",
               "string - Option B text",
@@ -169,5 +169,3 @@ export const MAIN_TOPIC_TEST_STRUCTURE_TEMPLATE_MCQS = {
     ],
   },
 };
-
-

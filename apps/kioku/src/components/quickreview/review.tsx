@@ -42,6 +42,8 @@ export const ReviewList = memo(function ReviewList({ showNotes }: any) {
     filterCategory,
     reviewToLog,
     isSubTopic,
+    reviewType,
+    reviewDifficulty,
     allQuestionsData,
     testData,
     isDialogOpen,
@@ -56,10 +58,15 @@ export const ReviewList = memo(function ReviewList({ showNotes }: any) {
     dispatch({ type: "SET_FILTER_CATEGORY", payload: category });
   }, []);
 
-  const setReviewToLog = useCallback((id: number) => {
-    dispatch({ type: "SET_REVIEW_TO_LOG", payload: id });
-    dispatch({ type: "SET_DIALOG_OPEN", payload: true });
-  }, []);
+  const setReviewToLog = useCallback(
+    (id: number, mode: string, difficulty: string) => {
+      dispatch({ type: "SET_REVIEW_TO_LOG", payload: id });
+      dispatch({ type: "SET_REVIEW_TYPE", payload: mode });
+      dispatch({ type: "SET_REVIEW_DIFFICULTY", payload: difficulty });
+      dispatch({ type: "SET_DIALOG_OPEN", payload: true });
+    },
+    []
+  );
 
   const setIsQuickTest = useCallback((open: boolean) => {
     dispatch({ type: "SET_QUICK_TEST", payload: open });
@@ -70,16 +77,17 @@ export const ReviewList = memo(function ReviewList({ showNotes }: any) {
     if (!reviewToLog) return;
     async function fetchTestData() {
       try {
-        const res = await get_a_test(reviewToLog, isSubTopic);
+        const res = await get_a_test(reviewToLog, isSubTopic, reviewType, reviewDifficulty);
         const data = JSON.parse(res);
         dispatch({
           type: "SET_TEST_DATA",
           payload: {
             testData: data.outputStructure,
+            questionsData: data.questions,
           },
         });
       } catch (error) {
-        console.error(`Falied to fetch test data`,error);
+        console.error(`Failed to fetch test data`, error);
       }
     }
     fetchTestData();
@@ -264,7 +272,7 @@ export const ReviewList = memo(function ReviewList({ showNotes }: any) {
           }
         />
       }
-      {isDialogOpen && testData  && (
+      {isDialogOpen && testData && (
         <Suspense fallback={<div>Loading....</div>}>
           <TestDialog
             dialogOpen={isDialogOpen}

@@ -256,12 +256,10 @@ export const generate_a_Test = async (
     const get_a_new_test = await LearningLogTestService.generateTest({
       learningLogId: parseInt(id),
       subTopicId: isSubTopic === "1" ? parseInt(id) : undefined,
-      mode: "MCQs",
+      mode: mode,
       userId,
-      difficulty: "HARD",
+      difficulty: difficulty,
     });
-    console.log(get_a_new_test);
-    
 
     sendResponse(res, 200, "Test Generated Successfully", { get_a_new_test });
   } catch (error) {
@@ -275,7 +273,7 @@ export const check_The_Result = async (
 ): Promise<void> => {
   const { question, correctAnswer, userAnswer } = req.body;
   const userId = req.auth.userId;
-
+  
   if (!userId) {
     sendError(res, 401, "Unauthorized - User ID not found");
     return;
@@ -294,7 +292,8 @@ export const check_The_Result = async (
     const testAnswer = await resultGenerateModel(
       `"Question: "${question}+",Correct Answer :"+${correctAnswer}+" User Answer To Check: " +${userAnswer}`
     );
-
+    console.log("correct test answer ",testAnswer);
+    
     sendResponse(res, 200, "Check Generated Successfully", {
       test: testAnswer,
     });
