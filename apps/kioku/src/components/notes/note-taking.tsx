@@ -7,7 +7,7 @@ import { useUser } from "@clerk/nextjs";
 import TailwindAdvancedEditor from "../textEditor";
 import { ScrollArea } from "../ui/scroll-area";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
-import { X, BookOpen, Tag, CalendarDays } from "lucide-react";
+import { IconX, IconBook2, IconTag, IconCalendar } from "@tabler/icons-react";
 import { Button } from "../ui/button";
 import NoteForm from "./note-form";
 
@@ -89,7 +89,7 @@ export default function NoteTaking({
                   onClick={onClose}
                   className="h-8 w-8"
                 >
-                  <X className="h-4 w-4" />
+                  <IconX className="h-4 w-4" />
                 </Button>
               )}
             </div>

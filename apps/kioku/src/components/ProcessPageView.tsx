@@ -29,7 +29,7 @@ import {
   Pie,
   Cell,
 } from "recharts";
-import { Brain, Calendar, ChevronUp, Clock, Star } from "lucide-react";
+import { IconBrain, IconCalendar, IconChevronUp, IconClock, IconStar } from "@tabler/icons-react";
 import DashboardHeader from "./dashboard/dashboard-header";
 import { Suspense } from "react";
 import { Skeleton } from "./ui/skeleton";

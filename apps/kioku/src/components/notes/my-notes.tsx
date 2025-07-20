@@ -18,13 +18,13 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import {
-  AlertCircle,
-  BookOpen,
-  Eye,
-  BarChart3,
-  Layers,
-  CalendarDays,
-} from "lucide-react";
+  IconAlertCircle,
+  IconBook2,
+  IconEye,
+  IconChartBar,
+  IconStack2,
+  IconCalendar,
+} from "@tabler/icons-react";
 import {
   Dialog,
   DialogContent,
@@ -98,12 +98,12 @@ console.log("mynotes ",Data);
                         {item.topic}
                       </TableCell>
                       <TableCell className="flex items-center gap-2">
-                        <Layers size={16} className="text-blue-500" />
+                        <IconStack2 size={16} className="text-blue-500" />
                         {item.category}
                       </TableCell>
                       <TableCell className="font-medium">
                         <div className="flex items-center gap-2">
-                          <Layers size={16} />
+                          <IconStack2 size={16} />
                           {item.totalSubTopic}
                         </div>
                       </TableCell>
@@ -111,7 +111,7 @@ console.log("mynotes ",Data);
                         <div
                           className={`flex items-center gap-2 ${retentionClass} font-medium`}
                         >
-                          <BarChart3 size={16} />
+                          <IconChartBar size={16} />
                           {item.retention ? item.retention + "%" : "0%"}
                         </div>
                       </TableCell>
@@ -161,7 +161,7 @@ console.log("mynotes ",Data);
                     </div>
 
                     <CardDescription className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-                      <Layers size={16} className="text-blue-500" />
+                      <IconStack2 size={16} className="text-blue-500" />
                       {item.category}
                     </CardDescription>
                   </CardHeader>
@@ -169,7 +169,7 @@ console.log("mynotes ",Data);
                     <div className="space-y-3">
                       <div className="flex justify-between items-center">
                         <p className="font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
-                          <Layers size={16} className="text-indigo-500" />
+                          <IconStack2 size={16} className="text-indigo-500" />
                           SubTopic:
                         </p>
                         <span className="bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200 px-2 py-1 rounded-md text-sm font-medium">
@@ -178,7 +178,7 @@ console.log("mynotes ",Data);
                       </div>
                       <div className="flex justify-between items-center">
                         <p className="font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
-                          <BarChart3 size={16} className={retentionClass} />
+                          <IconChartBar size={16} className={retentionClass} />
                           Retention:
                         </p>
                         <span

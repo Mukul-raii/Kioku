@@ -9,7 +9,7 @@ import {
   useReducer,
   useState,
 } from "react";
-import { Clock, Brain } from "lucide-react";
+import { IconClock, IconBrain } from "@tabler/icons-react";
 import { Badge } from "../ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import {
@@ -200,14 +200,14 @@ export const ReviewList = memo(function ReviewList({ showNotes }: any) {
       >
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="topics" className="flex gap-2">
-            <Clock className="h-4 w-4" />
+            <IconClock className="h-4 w-4" />
             <span>Topics</span>
             <Badge variant="secondary" className="ml-auto">
               {topicsCount}
             </Badge>
           </TabsTrigger>
           <TabsTrigger value="subtopics" className="flex gap-2">
-            <Brain className="h-4 w-4" />
+            <IconBrain className="h-4 w-4" />
             <span>Sub-Topics</span>
             <Badge variant="secondary" className="ml-auto">
               {subtopicsCount}

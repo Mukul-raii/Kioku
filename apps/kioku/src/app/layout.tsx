@@ -4,6 +4,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { Inter } from "next/font/google";
 import Navbar from "@/components/Navbar";
 import { ThemeProvider } from "@/components/theme-provider";
+import { SidebarProvider } from "@/contexts/SidebarContext";
 import { Profiler } from "react";
 
 export const metadata: Metadata = {
@@ -48,8 +49,10 @@ export default function RootLayout({
               enableSystem
               disableTransitionOnChange
             >
-              <Navbar />
-              {children}
+              <SidebarProvider>
+                <Navbar />
+                {children}
+              </SidebarProvider>
             </ThemeProvider>
           </body>
         </html>

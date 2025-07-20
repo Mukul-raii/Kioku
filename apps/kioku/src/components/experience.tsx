@@ -1,6 +1,6 @@
 import { Badge } from "./ui/badge";
 import { Card, CardContent } from "./ui/card";
-import { BookOpen, Brain, Lightbulb, MessageCircle } from "lucide-react";
+import { IconBook2, IconBrain, IconBulb, IconMessageCircle } from "@tabler/icons-react";
 
 export default function Experience() {
   return (
@@ -27,7 +27,7 @@ export default function Experience() {
             <CardContent className="pt-6">
               <div className="flex items-center gap-3 mb-4">
                 <div className="p-3 rounded-lg bg-blue-900/30">
-                  <BookOpen className="h-6 w-6 text-blue-400" />
+                  <IconBook2 className="h-6 w-6 text-blue-400" />
                 </div>
                 <h2 className="text-2xl font-bold text-slate-100">
                   Reflect
@@ -45,7 +45,7 @@ export default function Experience() {
             <CardContent className="pt-6">
               <div className="flex items-center gap-3 mb-4">
                 <div className="p-3 rounded-lg bg-purple-900/30">
-                  <Brain className="h-6 w-6 text-purple-400" />
+                  <IconBrain className="h-6 w-6 text-purple-400" />
                 </div>
                 <h2 className="text-2xl font-bold text-slate-100">
                   Revise
@@ -63,7 +63,7 @@ export default function Experience() {
             <CardContent className="pt-6">
               <div className="flex items-center gap-3 mb-4">
                 <div className="p-3 rounded-lg bg-indigo-900/30">
-                  <Lightbulb className="h-6 w-6 text-indigo-400" />
+                  <IconBulb className="h-6 w-6 text-indigo-400" />
                 </div>
                 <h2 className="text-2xl font-bold text-slate-100">
                   Rewire
@@ -81,7 +81,7 @@ export default function Experience() {
             <CardContent className="pt-6">
               <div className="flex items-center gap-3 mb-4">
                 <div className="p-3 rounded-lg bg-green-900/30">
-                  <MessageCircle className="h-6 w-6 text-green-400" />
+                  <IconMessageCircle className="h-6 w-6 text-green-400" />
                 </div>
                 <h2 className="text-2xl font-bold text-slate-100">
                   Respond

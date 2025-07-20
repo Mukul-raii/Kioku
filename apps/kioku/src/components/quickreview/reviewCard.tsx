@@ -17,8 +17,8 @@ import {
 } from "../ui/dialog";
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
-import { Calendar, ClipboardList } from "lucide-react";
-import { BookOpen } from "lucide-react";
+import { IconCalendar, IconClipboardList } from "@tabler/icons-react";
+import { IconBook2 } from "@tabler/icons-react";
 import { TabsContent } from "../ui/tabs";
 import { memo, useState } from "react";
 import { Label } from "../ui/label";
@@ -62,7 +62,7 @@ export const ReviewCard = memo(function ReviewCard({
             <Badge className={item.category}>{item.category}</Badge>
           </CardTitle>
           <CardDescription className="flex items-center mt-1">
-            <Calendar className="h-3.5 w-3.5 mr-1" />
+            <IconCalendar className="h-3.5 w-3.5 mr-1" />
             {formatDate(item.date || item.reviewDate)}
           </CardDescription>
         </CardHeader>
@@ -88,7 +88,7 @@ export const ReviewCard = memo(function ReviewCard({
             }}
             className="w-full"
           >
-            <BookOpen className="h-4 w-4 mr-2" />
+            <IconBook2 className="h-4 w-4 mr-2" />
             Quick Review
           </Button>
         </CardFooter>
@@ -171,7 +171,7 @@ export const NoDataCard = memo(function NoDataCard({
   return (
     <Card className="p-8 text-center">
       <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-muted mb-4">
-        <ClipboardList className="h-6 w-6 text-muted-foreground" />
+        <IconClipboardList className="h-6 w-6 text-muted-foreground" />
       </div>
       <h2 className="text-xl font-semibold mb-2">{title}</h2>
       <p className="text-muted-foreground mb-4">{message}</p>

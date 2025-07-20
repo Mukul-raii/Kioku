@@ -2,7 +2,7 @@ import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import TailwindAdvancedEditor from "../textEditor";
 import { ScrollArea } from "../ui/scroll-area";
-import { BookOpen, Tag, CalendarDays } from "lucide-react";
+import { IconBook2, IconTag, IconCalendar } from "@tabler/icons-react";
 import { Button } from "../ui/button";
 
 export default function NoteForm({
@@ -34,7 +34,7 @@ export default function NoteForm({
       <div className="flex flex-col md:flex-row gap-4">
         <div className="flex-1 space-y-2">
           <div className="flex items-center">
-            <BookOpen className="w-4 h-4 text-blue-500 mr-2" />
+            <IconBook2 className="w-4 h-4 text-blue-500 mr-2" />
             <Label className="font-medium ">Topic</Label>
           </div>
           <Input
@@ -48,7 +48,7 @@ export default function NoteForm({
 
         <div className="flex-1 space-y-2">
           <div className="flex items-center">
-            <Tag className="w-4 h-4 text-green-500 mr-2" />
+            <IconTag className="w-4 h-4 text-green-500 mr-2" />
             <Label className="font-medium ">Category</Label>
           </div>
           <Input
@@ -63,7 +63,7 @@ export default function NoteForm({
 
       <div className="space-y-4">
         <div className="flex items-center">
-          <CalendarDays className="w-4 h-4 text-purple-500 mr-2" />
+          <IconCalendar className="w-4 h-4 text-purple-500 mr-2" />
           <Label className="font-medium ">Notes</Label>
         </div>
         <ScrollArea className=" w-full  scrollbar-none ">

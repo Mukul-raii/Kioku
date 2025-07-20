@@ -1,4 +1,4 @@
-import { Award, BookOpen, Calendar, Clock } from "lucide-react"
+import { IconAward, IconBook2, IconCalendar, IconClock } from "@tabler/icons-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 interface DashboardMetricsProps {
@@ -19,7 +19,7 @@ export default function DashboardMetrics({
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Mastered Topics</CardTitle>
-          <Award className="h-4 w-4 text-yellow-500" />
+          <IconAward className="h-4 w-4 text-yellow-500" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{masteredTopicCount}</div>
@@ -30,7 +30,7 @@ export default function DashboardMetrics({
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Reviews This Month</CardTitle>
-          <BookOpen className="h-4 w-4 text-blue-500" />
+          <IconBook2 className="h-4 w-4 text-blue-500" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{reviewThisMonthCount}</div>
@@ -41,7 +41,7 @@ export default function DashboardMetrics({
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Active Days</CardTitle>
-          <Calendar className="h-4 w-4 text-green-500" />
+          <IconCalendar className="h-4 w-4 text-green-500" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{daysActiveThisMonth}</div>
@@ -52,7 +52,7 @@ export default function DashboardMetrics({
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Upcoming Reviews</CardTitle>
-          <Clock className="h-4 w-4 text-purple-500" />
+          <IconClock className="h-4 w-4 text-purple-500" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{upcomingReviewCount}</div>

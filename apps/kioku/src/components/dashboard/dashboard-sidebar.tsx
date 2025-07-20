@@ -2,17 +2,17 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { BarChart3, BookOpen, Calendar, LayoutDashboard, ListChecks, LogOut, Settings, User } from "lucide-react"
+import { IconChartBar, IconBook2, IconCalendar, IconLayoutDashboard, IconListCheck, IconLogout, IconSettings, IconUser } from "@tabler/icons-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { usePathname } from "next/navigation"
 
 const navItems = [
-  { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { name: "Learning Logs", href: "/logs", icon: BookOpen },
-  { name: "Reviews", href: "/reviews", icon: ListChecks },
-  { name: "Schedule", href: "/schedule", icon: Calendar },
-  { name: "Analytics", href: "/analytics", icon: BarChart3 },
+  { name: "Dashboard", href: "/dashboard", icon: IconLayoutDashboard },
+  { name: "Learning Logs", href: "/logs", icon: IconBook2 },
+  { name: "Reviews", href: "/reviews", icon: IconListCheck },
+  { name: "Schedule", href: "/schedule", icon: IconCalendar },
+  { name: "Analytics", href: "/analytics", icon: IconChartBar },
 ]
 
 export default function DashboardSidebar() {
@@ -30,13 +30,13 @@ export default function DashboardSidebar() {
         <div className="flex items-center justify-between h-16 px-4 border-b border-gray-200 dark:border-gray-800">
           {!collapsed && (
             <Link href="/" className="flex items-center">
-              <BookOpen className="h-6 w-6 text-primary" />
+              <IconBook2 className="h-6 w-6 text-primary" />
               <span className="ml-2 font-semibold text-lg">LearnTrack</span>
             </Link>
           )}
           {collapsed && (
             <div className="mx-auto">
-              <BookOpen className="h-6 w-6 text-primary" />
+              <IconBook2 className="h-6 w-6 text-primary" />
             </div>
           )}
           <Button variant="ghost" size="icon" onClick={() => setCollapsed(!collapsed)} className="ml-auto">
@@ -98,7 +98,7 @@ export default function DashboardSidebar() {
         <div className="border-t border-gray-200 dark:border-gray-800 p-4">
           <div className="flex items-center">
             <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-              <User className="h-4 w-4" />
+              <IconUser className="h-4 w-4" />
             </div>
             {!collapsed && (
               <div className="ml-3">
@@ -110,7 +110,7 @@ export default function DashboardSidebar() {
           <div className="mt-4 flex flex-col space-y-2">
             <Button variant="ghost" size={collapsed ? "icon" : "sm"} className="justify-start" asChild>
               <Link href="/settings">
-                <Settings className="h-4 w-4 mr-2" />
+                <IconSettings className="h-4 w-4 mr-2" />
                 {!collapsed && <span>Settings</span>}
               </Link>
             </Button>
@@ -119,7 +119,7 @@ export default function DashboardSidebar() {
               size={collapsed ? "icon" : "sm"}
               className="justify-start text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/50"
             >
-              <LogOut className="h-4 w-4 mr-2" />
+              <IconLogout className="h-4 w-4 mr-2" />
               {!collapsed && <span>Logout</span>}
             </Button>
           </div>

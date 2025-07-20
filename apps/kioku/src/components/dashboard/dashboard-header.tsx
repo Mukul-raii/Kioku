@@ -1,4 +1,4 @@
-import { AlertCircle } from "lucide-react"
+import { IconAlertCircle } from "@tabler/icons-react"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
 import { Button } from "@/components/ui/button"
@@ -29,7 +29,7 @@ export default function DashboardHeader({ retention, missedReviewCount }: Dashbo
 
       {missedReviewCount > 0 && (
         <Alert variant="destructive" className="mt-6">
-          <AlertCircle className="h-4 w-4" />
+          <IconAlertCircle className="h-4 w-4" />
           <AlertTitle>Attention needed</AlertTitle>
           <AlertDescription>
             You have {missedReviewCount} missed reviews. Completing these will help maintain your retention.

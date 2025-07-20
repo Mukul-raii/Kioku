@@ -5,16 +5,16 @@ import {
   DialogTitle,
   DialogDescription,
 } from "../ui/dialog";
-import { BrainCircuit } from "lucide-react";
+import { IconBrain } from "@tabler/icons-react";
 import { Badge } from "../ui/badge";
 import { Progress } from "../ui/progress";
 import { Label } from "../ui/label";
 import { Button } from "../ui/button";
-import { HelpCircle } from "lucide-react";
+import { IconHelp } from "@tabler/icons-react";
 import { Card, CardContent } from "../ui/card";
-import { Lightbulb } from "lucide-react";
+import { IconBulb } from "@tabler/icons-react";
 import { Input } from "../ui/input";
-import { CheckCircle2 } from "lucide-react";
+import { IconCircleCheck } from "@tabler/icons-react";
 import { useState } from "react";
 import { Answered } from "@repo/types";
 import { Checkbox } from "../ui/checkbox";
@@ -114,7 +114,7 @@ export default function TestDialog({
       <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl">
-            <BrainCircuit className="h-5 w-5" />
+            <IconBrain className="h-5 w-5" />
             {structure?.topic}
           </DialogTitle>
           <DialogDescription>
@@ -153,7 +153,7 @@ export default function TestDialog({
 
                 {showHint && (
                   <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg p-4 flex gap-3 items-start">
-                    <Lightbulb className="h-5 w-5 text-amber-600 mt-0.5 flex-shrink-0" />
+                    <IconBulb className="h-5 w-5 text-amber-600 mt-0.5 flex-shrink-0" />
                     <div onClick={() => setIsHint(true)}>
                       <p className="font-medium text-amber-800 dark:text-amber-400 mb-1">
                         Hint
@@ -176,7 +176,7 @@ export default function TestDialog({
                 disabled={showHint}
                 className="flex gap-2"
               >
-                <HelpCircle className="h-4 w-4" />
+                <IconHelp className="h-4 w-4" />
                 Show Hint
               </Button>
               {
@@ -186,7 +186,7 @@ export default function TestDialog({
                   disabled={showHint}
                   className="flex gap-2"
                 >
-                  <HelpCircle className="h-4 w-4" />
+                  <IconHelp className="h-4 w-4" />
                   Submit Answer
                 </Button>
               }
@@ -201,7 +201,7 @@ export default function TestDialog({
                 {isSubmitting ? (
                   <div className="h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
                 ) : (
-                  <CheckCircle2 className="h-4 w-4" />
+                  <IconCircleCheck className="h-4 w-4" />
                 )}
                 Check Answer
               </Button>
