@@ -240,7 +240,7 @@ export const generate_a_Test = async (
   const userId = req.auth.userId;
   const { id, isSubTopic } = req.params;
   const { mode, difficulty }: { mode: string; difficulty: string } = req.body;
-  console.log(userId, id, isSubTopic);
+  console.log(userId, id, isSubTopic,mode,difficulty);
 
   if (!userId) {
     sendError(res, 401, "Unauthorized - User ID not found");
@@ -292,11 +292,11 @@ export const check_The_Result = async (
     const testAnswer = await resultGenerateModel(
       `"Question: "${question}+",Correct Answer :"+${correctAnswer}+" User Answer To Check: " +${userAnswer}`
     );
-    console.log("correct test answer ",testAnswer);
     
     sendResponse(res, 200, "Check Generated Successfully", {
       test: testAnswer,
     });
+    
   } catch (error) {
     sendError(res, 500, "Failed to check answer", error);
   }
@@ -307,22 +307,9 @@ export const generate_a_Result_New_Topic = async (
   res: Response
 ): Promise<void> => {
   const { id, result } = req.body; //learning log id
+  const userId = req.auth.userId;
 
-  /* 
-  const reviewGenerate = await prisma.review.create({
-    data: {
-      logId: id,
-      testResult: {
-        create: resa.map((r: any) => ({
-          miniTopic: r.subTopic,
-          lastScore: r.rating / r.totalNumber,
-          currentInterval: 1, // interval is days until next review
-          RepetitionCount: r.rating / r.totalNumber >= 3 ? 1 : 0, // repetition count is how many successful reviews you had
-          nextReviewDate: new Date(
-            new Date().setDate(new Date().getDate() + 1)
-          ),
-        },
-    ))}; */
+  
 };
 
 export const generate_a_Result_Sub_Topic = async (

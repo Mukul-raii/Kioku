@@ -37,6 +37,7 @@ export class LearningLogTestService {
       });
     } else {
       const prompt = await this.buildMainTopicPrompt(learningLogId, userId);
+      console.log("generating main topic test 1 ", prompt);
       return TestGenerateModel.generateTest({
         prompt,
         mode,
@@ -82,7 +83,6 @@ export class LearningLogTestService {
     const learningLog = await prisma.learningNote.findUnique({
       where: { id: learningLogId, userId },
     });
-    console.log("learning log ", learningLog);
 
     if (!learningLog) {
       throw new Error("Learning log not found");

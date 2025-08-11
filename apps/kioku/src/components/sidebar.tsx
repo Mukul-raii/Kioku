@@ -49,7 +49,7 @@ export function SidebarLayout() {
   ];
 
   return (
-    <div className={`fixed left-0 top-0 h-full bg-white shadow-lg border-r border-gray-200 transition-all duration-300 z-40 ${
+    <div className={`fixed left-0 top-0 h-full bg-white shadow-lg border-r border-gray-200 transition-all duration-300 ease-in-out z-40 ${
       isCollapsed ? "w-16" : "w-64"
     }`}>
       <div className="relative flex items-center justify-between p-4 ">
@@ -78,7 +78,7 @@ export function SidebarLayout() {
           <button
             key={idx}
             onClick={() => router.push(link.href)}
-            className={`flex items-center gap-3 py-3 px-3 text-gray-700 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all duration-200 group ${
+            className={`flex items-center gap-3 py-3 px-3 text-gray-700 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all duration-200 ease-in-out group ${
               isCollapsed ? "justify-center" : ""
             }`}
           >
@@ -86,7 +86,10 @@ export function SidebarLayout() {
               {link.icon}
             </span>
             {!isCollapsed && (
-              <span className="font-medium text-sm">{link.label}</span>
+              <span className="font-medium text-sm transition-all duration-300 ease-in-out">
+                {link.label}
+              </span>
+
             )}
           </button>
         ))}

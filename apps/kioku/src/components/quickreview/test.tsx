@@ -5,20 +5,24 @@ import {
   DialogTitle,
   DialogDescription,
 } from "../ui/dialog";
-import { IconBrain } from "@tabler/icons-react";
+import { IconArrowBackUp, IconBrain, IconStar } from "@tabler/icons-react";
 import { Badge } from "../ui/badge";
 import { Progress } from "../ui/progress";
 import { Label } from "../ui/label";
 import { Button } from "../ui/button";
 import { IconHelp } from "@tabler/icons-react";
-import { Card, CardContent } from "../ui/card";
+import { Card, CardContent, CardFooter } from "../ui/card";
 import { IconBulb } from "@tabler/icons-react";
 import { Input } from "../ui/input";
 import { IconCircleCheck } from "@tabler/icons-react";
 import { useState } from "react";
 import { Answered } from "@repo/types";
 import { Checkbox } from "../ui/checkbox";
-import { check_test_result } from "@/app/actions/learning-log";
+import {
+  check_test_result,
+  get_a_test_result,
+} from "@/app/actions/learning-log";
+import { array } from "zod";
 
 interface testDialogProps {
   dialogOpen: boolean;
@@ -41,9 +45,13 @@ export default function TestDialog({
   const [answerRating, setAnswerRating] = useState("");
   const [checkResultDialogOpen, setCheckResultDialogOpen] = useState(false);
   const [checkResultData, setCheckResultData] = useState<any>(null);
+  const [rating, setRating] = useState<number | null>(null);
+  const [isHintUsed, setIsHintUsed] = useState(false);
+  const [isSetRating, setIsSetRating] = useState(false);
   const structure = testData?.structure;
   const testType = testData?.testType;
   const format = testData?.format;
+  console.log("testData", testData);
 
   const allQuestions =
     structure?.subtopics?.flatMap((sub: any) => sub.questions) || [];
@@ -62,20 +70,19 @@ export default function TestDialog({
           question: currentQuestion?.question,
           answer: answer,
           subTopic: currentQuestion?.subTopic,
-          rating: parseInt(answerRating),
-          isHintUsed: isHint,
+          rating: rating || 0,
+          isHintUsed: isHintUsed,
         },
       ]);
 
-      setCurrentIndex(currentIndex + 1);
+      if (currentIndex < totalQuestions - 1) {
+        setCurrentIndex(currentIndex + 1);
+      }
       setAnswer("");
+      setRating(null);
       setAnswerRating("");
       setShowHint(false);
       setCheckResultDialogOpen(false);
-    }
-    if (currentIndex > totalQuestions - 1) {
-      const res = await checkTheAnswer();
-      console.log(res);
     }
   }
 
@@ -89,17 +96,27 @@ export default function TestDialog({
   }
 
   async function checkTheAnswer() {
+    console.log(
+      "Checking answer:",
+      currentQuestion?.question,
+      answer,
+      currentQuestion.answer,
+      currentQuestion.correctAnswer
+    );
     if (!answer.trim()) return;
 
     setIsSubmitting(true);
     try {
       const res = await check_test_result({
-        question: currentQuestion?.question ,
-        correctAnswer: currentQuestion?.answer ||currentQuestion?.correctAnswer,
+        question: currentQuestion?.question,
+        correctAnswer:
+          currentQuestion?.answer || currentQuestion?.correctAnswer,
         userAnswer: answer,
       });
 
+      console.log(res);
       const resultData = JSON.parse(res);
+      handleNextQuestion();
       setCheckResultData(resultData);
       setCheckResultDialogOpen(true);
     } catch (error) {
@@ -109,107 +126,161 @@ export default function TestDialog({
     }
   }
 
+  async function submitTest() {
+    console.log("Submitting test with answers:", allAnswers);
+
+    try {
+      const res = await get_a_test_result(testData.id, allAnswers);
+      console.log("Test result submitted:", res);
+    } catch (error) {
+      console.error("Error submitting test result:", error);
+    }
+  }
+
   return (
-    <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-      <DialogContent className="sm:max-w-2xl">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-xl">
-            <IconBrain className="h-5 w-5" />
-            {structure?.topic}
-          </DialogTitle>
-          <DialogDescription>
-            Test your knowledge with these questions
-          </DialogDescription>
-        </DialogHeader>
+    <div className="fixed w-full inset-0 z-50 flex flex-col items-center bg-white  gap-4">
+      <div className="flex justify-between items-center w-full border-b border-gray-200 py-1 px-6 gap-10">
+        <div
+          onClick={() => setDialogOpen(false)}
+          className="p-1 flex flex-row justify-between w-auto items-center cursor-pointer "
+        >
+          <IconArrowBackUp size={16} className="mr-2" />
+          Exit
+        </div>
+        <p>Test</p>
+        <div className="flex w-auto"></div>
+      </div>
 
-        <div className="mt-2">
+      <div className="max-w-7xl mx-auto flex flex-col gap-4">
+        <div className="w-full shadow rounded-md p-6 ">
+          {/* Question topic + finish btn  */}
           <div className="flex items-center justify-between mb-2 text-sm text-muted-foreground">
-            <span>
-              Question {currentIndex + 1} of {totalQuestions}
-            </span>
-            <Badge variant="outline">{currentQuestion?.subTopic}</Badge>
+            <div className="flex flex-col">
+              <h1 className="text-lg font-semibold">
+                {testType}
+                <Badge className="ml-2" variant="outline">
+                  {format === "long_answer" ? "Long Answer" : "Multiple Choice"}
+                </Badge>
+              </h1>
+              <span>
+                Question {currentIndex + 1} of {totalQuestions}
+              </span>
+            </div>
+            <button>Finish Test</button>
           </div>
-          <Progress
-            value={((currentIndex + 1) / totalQuestions) * 100}
-            className="h-2 mb-6"
-          />
 
-          <Card className="mb-6">
-            <CardContent className="pt-6">
-              <h3 className="text-lg font-medium mb-4 leading-relaxed">
-                {currentQuestion?.question}
-              </h3>
-
-              <div className="space-y-4">
-                {/* Type of Answer */}
-                {format === "mcq" ? (
-                  <MCQsQuestion
-                    options={currentQuestion.options}
-                    setAnswer={setAnswer}
-                  />
-                ) : (
-                  <LongQuestion answer={answer} setAnswer={setAnswer} />
-                )}
-
-                {showHint && (
-                  <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg p-4 flex gap-3 items-start">
-                    <IconBulb className="h-5 w-5 text-amber-600 mt-0.5 flex-shrink-0" />
-                    <div onClick={() => setIsHint(true)}>
-                      <p className="font-medium text-amber-800 dark:text-amber-400 mb-1">
-                        Hint
-                      </p>
-                      <p className="text-amber-700 dark:text-amber-300">
-                        {currentQuestion?.hint || "No hint available"}
-                      </p>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-
-          <div className="flex flex-wrap gap-3 justify-between">
-            <div className="flex gap-3">
-              <Button
-                variant="outline"
-                onClick={() => setShowHint(true)}
-                disabled={showHint}
-                className="flex gap-2"
-              >
-                <IconHelp className="h-4 w-4" />
-                Show Hint
-              </Button>
-              {
-                <Button
-                  variant="outline"
-                  onClick={() => checkTheAnswer()}
-                  disabled={showHint}
-                  className="flex gap-2"
-                >
-                  <IconHelp className="h-4 w-4" />
-                  Submit Answer
-                </Button>
-              }
-            </div>
-
-            <div className="flex gap-3">
-              <Button
-                onClick={checkTheAnswer}
-                disabled={!answer.trim() || isSubmitting}
-                className="flex gap-2"
-              >
-                {isSubmitting ? (
-                  <div className="h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                ) : (
-                  <IconCircleCheck className="h-4 w-4" />
-                )}
-                Check Answer
-              </Button>
-            </div>
+          {/* timelinke  */}
+          <div className="w-full">
+            <Progress
+              value={((currentIndex + 1) / totalQuestions) * 100}
+              className="h-2 mb-6"
+            />
           </div>
         </div>
-      </DialogContent>
-    </Dialog>
+        <div className="flex justify-between items-center mb-4 gap-4">
+          <div className="min-w-[32%] hidden md:block h-full p-2 shadow rounded-md ">
+            <div className="grid grid-cols-5 gap-2">
+              {allQuestions.map((question, index) => {
+                return (
+                  <div
+                    key={index}
+                    className={`w-full p-1 border rounded-md flex justify-center items-center ${currentIndex === index ? "bg-blue-500 text-white" : "bg-white text-black"}`}
+                  >
+                    {index + 1}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+          <div className="">
+            <Card className="py-0 border-none shadow ">
+              <CardContent className="p-4">
+                <p className="text-lg mb-2 ">{currentQuestion?.question}</p>
+
+                <div className="space-y-4">
+                  {/* Type of Answer */}
+                  {format === "mcq" ? (
+                    <MCQsQuestion
+                      options={currentQuestion.options}
+                      setAnswer={setAnswer}
+                    />
+                  ) : (
+                    <LongQuestion answer={answer} setAnswer={setAnswer} />
+                  )}
+
+                  {showHint && (
+                    <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg p-4 flex gap-3 items-start">
+                      <IconBulb className="h-5 w-5 text-amber-600 mt-0.5 flex-shrink-0" />
+                      <div onClick={() => setIsHint(true)}>
+                        <p className="font-medium text-amber-800 dark:text-amber-400 mb-1">
+                          Hint
+                        </p>
+                        <p className="text-amber-700 dark:text-amber-300">
+                          {currentQuestion?.hint || "No hint available"}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+              <CardFooter className="border-t-2 border-gray-400 p-0 mx-4 py-2">
+                <div className="flex w-full flex-wrap gap-3 mt-2 justify-between">
+                  <div className="flex gap-3">
+                    <Button
+                      variant="outline"
+                      onClick={() => setShowHint(true)}
+                      disabled={showHint}
+                      className="flex gap-2"
+                    >
+                      <IconHelp className="h-4 w-4" />
+                      Show Hint
+                    </Button>
+                  </div>
+                  <div className="flex gap-3">
+                    {currentIndex !== totalQuestions - 1 ? (
+                      <>
+                        {isSetRating && (
+                          <div className="flex items-center gap-2 border rounded-md px-2">
+                            {Array.from({ length: 5 }).map((_, i) => (
+                              <IconStar
+                                className="cursor-pointer"
+                                key={i}
+                                onClick={() => {
+                                  setIsSetRating(false);
+                                  setRating(i + 1);
+                                  checkTheAnswer();
+                                }}
+                              />
+                            ))}
+                          </div>
+                        )}
+                        <Button
+                          className="flex items-center gap-2 border rounded-md px-2 cursor-pointer"
+                          disabled={isSetRating || isSubmitting}
+                          onClick={() => {setIsSetRating(true)}}
+                        >
+                          <IconCircleCheck className="h-4 w-4" />
+                          Answer
+                        </Button>
+                      </>
+                    ) : (
+                      <Button
+                        variant="outline"
+                        onClick={() => submitTest()}
+                        className="flex gap-2"
+                      >
+                        <IconCircleCheck className="h-4 w-4" />
+                        Submit Answer
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </CardFooter>
+            </Card>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -237,7 +308,6 @@ function MCQsQuestion({
   options: any;
   setAnswer: any;
 }) {
-
   return (
     <div className="space-y-2 ">
       {options.map((opt, index) => (

@@ -60,7 +60,9 @@ export const check_test_result = async ({
       headers: { Authorization: `Bearer ${token}` },
     }
   );
-  return response.data.test;
+  console.log("check_test_result response:", response.data);
+  
+  return response.data.data.test;
 };
 
 export const get_a_test = async (id: number, isSubtopic: number,reviewType:string,reviewDifficulty:string) => {
@@ -81,7 +83,7 @@ export const get_a_test = async (id: number, isSubtopic: number,reviewType:strin
   return response.data.data.get_a_new_test;
 };
 
-export const get_a_test_result = async (id: number, result) => {
+export const get_a_test_result = async (id: number, result: any) => {
   const { getToken } = await auth();
   const token = await getToken();
   console.log(id, result);

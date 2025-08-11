@@ -127,7 +127,7 @@ console.log("mynotes ",Data);
                             setIsNotesOpen(true);
                           }}
                         >
-                          <Eye size={16} className="mr-2" /> View
+                          <IconEye size={16} className="mr-2" /> View
                         </Button>
                       </TableCell>
                     </TableRow>

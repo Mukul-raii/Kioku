@@ -11,7 +11,7 @@ import {
   Dialog,
   DialogContent,
   DialogHeader,
-  DialogTitle,
+  DialogTitle, 
   DialogDescription,
   DialogTrigger,
 } from "../ui/dialog";
@@ -22,13 +22,6 @@ import { IconBook2 } from "@tabler/icons-react";
 import { TabsContent } from "../ui/tabs";
 import { memo, useState } from "react";
 import { Label } from "../ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../ui/select";
 
 export const ReviewCard = memo(function ReviewCard({
   item,
@@ -94,8 +87,8 @@ export const ReviewCard = memo(function ReviewCard({
         </CardFooter>
       </Card>
       {reviewType && (
-        <Dialog open={reviewType} onOpenChange={setReviewType}>
-          <DialogContent className="sm:max-w-[400px]">
+        <Dialog open={reviewType} onOpenChange={setReviewType} modal={true}>
+          <DialogContent className="sm:max-w-[400px] ">
             <DialogHeader>
               <DialogTitle>Choose Type and Difficulty</DialogTitle>
               <DialogDescription>
@@ -106,32 +99,28 @@ export const ReviewCard = memo(function ReviewCard({
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="type">Review Type</Label>
-                <Select value={selectedType} onValueChange={setSelectedType}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="MCQ">Multiple Choice</SelectItem>
-                    <SelectItem value="LONG">Long Answer</SelectItem>
-                  </SelectContent>
-                </Select>
+                <select 
+                  value={selectedType} 
+                  onChange={(e) => setSelectedType(e.target.value)}
+                  className="flex h-10 w-full  border  bg-background px-3 py-2 text-sm"
+                >
+                  <option value="MCQ">Multiple Choice</option>
+                  <option value="LONG">Long Answer</option>
+                </select>
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="difficulty">Difficulty</Label>
-                <Select
-                  value={selectedDifficulty}
-                  onValueChange={setSelectedDifficulty}
+                <select 
+                  value={selectedDifficulty} 
+                  onChange={(e) => setSelectedDifficulty(e.target.value)}
+                  className="flex h-10 w-full  border  bg-background px-3 py-2 text-sm"
+                  style={{ marginBottom: "1rem" ,borderRadius:'none'}}
                 >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select difficulty" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Easy">Easy</SelectItem>
-                    <SelectItem value="Medium">Medium</SelectItem>
-                    <SelectItem value="Hard">Hard</SelectItem>
-                  </SelectContent>
-                </Select>
+                  <option value="Easy">Easy</option>
+                  <option value="Medium">Medium</option>
+                  <option value="Hard">Hard</option>
+                </select>
               </div>
 
               <div className="flex gap-2 pt-2">

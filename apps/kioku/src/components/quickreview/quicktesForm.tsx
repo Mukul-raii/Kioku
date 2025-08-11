@@ -140,7 +140,7 @@ export default function QuickTestForm({open,onChange,setQuickTest}) {
                       side="bottom"
                       align="start"
                     >
-                      <SelectItem value="MCQs">Multiple Choice</SelectItem>
+                      <SelectItem value="MCQ">Multiple Choice</SelectItem>
                       <SelectItem value="long_answer">Long Answer</SelectItem>
                     </SelectContent>
                   </Select>

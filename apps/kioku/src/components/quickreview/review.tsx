@@ -78,6 +78,8 @@ export const ReviewList = memo(function ReviewList({ showNotes }: any) {
     async function fetchTestData() {
       try {
         const res = await get_a_test(reviewToLog, isSubTopic, reviewType, reviewDifficulty);
+        console.log("Test data response:", res);
+        
         const data = JSON.parse(res);
         dispatch({
           type: "SET_TEST_DATA",
@@ -91,6 +93,7 @@ export const ReviewList = memo(function ReviewList({ showNotes }: any) {
       }
     }
     fetchTestData();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reviewToLog, isSubTopic]);
 
   useEffect(() => {

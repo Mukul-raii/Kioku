@@ -55,6 +55,8 @@ export class generate_test_model {
     isSubTopic: boolean;
   }) {
     const { prompt, mode, difficulty, isSubTopic } = params;
+    console.log("Generating test with params:", mode,difficulty);
+    
     if (isSubTopic) {
       return await this.generate_sub_topic_test({ prompt, mode, difficulty });
     } else {
@@ -70,7 +72,7 @@ export class generate_test_model {
     const { prompt, mode, difficulty } = params;
     console.log(prompt,mode,difficulty)
     let response;
-    if (mode === "MCQs") {
+    if (mode === "MCQ") {
       response = await generate_test({
         prompt,
         mode,
@@ -96,7 +98,7 @@ export class generate_test_model {
     const { prompt, mode, difficulty } = params;
 
     let response;
-    if (mode === "MCQs") {
+    if (mode === "MCQ") {
       response = await generate_test({
         prompt,
         mode,
@@ -122,7 +124,7 @@ export class generate_test_model {
     const { prompt, mode, difficulty } = params;
 
     let response;
-    if (mode === "MCQs") {
+    if (mode === "MCQ") {
       response = await generate_test({
         prompt,
         mode,
