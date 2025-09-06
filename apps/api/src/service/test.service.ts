@@ -103,15 +103,20 @@ export class QuickTestGenerationService {
     difficulty: string;
     userId: string;
   }) {
-    const { topic, category, mode, difficulty, quickTestId, subTopicId } =params;
+    const { topic, category, mode, difficulty, quickTestId, subTopicId } =
+      params;
     if (quickTestId) {
       const prompt = await this.buildQuizBasedQuickTest(params);
-      return await generate_test_model.generateQuizTest({prompt,mode,difficulty});
+      return await generate_test_model.generateQuizTest({
+        prompt,
+        mode,
+        difficulty,
+      });
     } else {
       console.log("BUILDING THE QUICK TEST");
-      
+
       const prompt = this.buildBasicQuickTestPrompt({ topic, category });
-      return generate_test_model.generateQuizTest({prompt,mode,difficulty}) 
+      return generate_test_model.generateQuizTest({ prompt, mode, difficulty });
     }
   }
 
@@ -124,9 +129,9 @@ export class QuickTestGenerationService {
     subTopicId?: number;
   }) {
     const { learningLogId, userId, mode, difficulty } = params;
-    
-    const prompt =await this.buildNoteBasedTestPrompt(params)
-    return generate_test_model.generateTest({prompt,mode,difficulty}) 
+
+    const prompt = await this.buildNoteBasedTestPrompt(params);
+    return generate_test_model.generateTest({ prompt, mode, difficulty });
   }
 
   private static async buildNoteBasedTestPrompt(params: {
@@ -135,7 +140,7 @@ export class QuickTestGenerationService {
     mode: string;
     difficulty: string;
   }) {
-    const {learningLogId,userId,mode,difficulty } = params;
+    const { learningLogId, userId, mode, difficulty } = params;
     const learningLogData = await prisma.learningNote.findFirst({
       where: {
         id: learningLogId,
@@ -148,20 +153,19 @@ export class QuickTestGenerationService {
         },
       },
     });
-  if (!learningLogData) {
-    throw new Error("Learning log not found");
-  }
+    if (!learningLogData) {
+      throw new Error("Learning log not found");
+    }
 
     const subTopics = learningLogData?.review
       .flatMap((review) => review.testResult)
       .map((result) => result.miniTopic)
       .filter((topic, index, arr) => arr.indexOf(topic) === index || []);
 
-      if(!subTopics) return
-    
-    const subTopicsText = subTopics.length > 0 
-    ? `SubTopics: ${subTopics.join(', ')}` 
-    : '';
+    if (!subTopics) return;
+
+    const subTopicsText =
+      subTopics.length > 0 ? `SubTopics: ${subTopics.join(", ")}` : "";
 
     return `Generate a comprehensive test on the following topic:
     Topic: ${learningLogData?.topic}
@@ -206,7 +210,7 @@ export class QuickTestGenerationService {
     category: string;
   }) {
     const { topic, category, subTopics } = params;
-  
+
     return `Generate a comprehensive test on the following topic:
     Topic: ${topic}
     Category: ${category}

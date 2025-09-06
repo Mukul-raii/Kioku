@@ -1,7 +1,3 @@
-
-
-
-
 export const formatDate = (dateString: string) => {
   try {
     const date = new Date(dateString);
@@ -15,8 +11,7 @@ export const formatDate = (dateString: string) => {
   }
 };
 
-
-export const getDueStatus = (dateString:string) => {
+export const getDueStatus = (dateString: string) => {
   try {
     const reviewDate = new Date(dateString);
     const today = new Date();

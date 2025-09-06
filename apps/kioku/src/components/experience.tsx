@@ -1,6 +1,11 @@
 import { Badge } from "./ui/badge";
 import { Card, CardContent } from "./ui/card";
-import { IconBook2, IconBrain, IconBulb, IconMessageCircle } from "@tabler/icons-react";
+import {
+  IconBook2,
+  IconBrain,
+  IconBulb,
+  IconMessageCircle,
+} from "@tabler/icons-react";
 
 export default function Experience() {
   return (
@@ -15,7 +20,8 @@ export default function Experience() {
             Choose Your Practice
           </h1>
           <p className="text-slate-300 max-w-2xl mx-auto text-lg">
-            Personalize your learning journey with our research-backed methods designed to optimize knowledge retention.
+            Personalize your learning journey with our research-backed methods
+            designed to optimize knowledge retention.
           </p>
         </div>
 
@@ -29,12 +35,11 @@ export default function Experience() {
                 <div className="p-3 rounded-lg bg-blue-900/30">
                   <IconBook2 className="h-6 w-6 text-blue-400" />
                 </div>
-                <h2 className="text-2xl font-bold text-slate-100">
-                  Reflect
-                </h2>
+                <h2 className="text-2xl font-bold text-slate-100">Reflect</h2>
               </div>
               <p className="text-slate-300">
-                Anchor your thoughts, organize your notes, and build clarity with guided reflection prompts.
+                Anchor your thoughts, organize your notes, and build clarity
+                with guided reflection prompts.
               </p>
             </CardContent>
           </Card>
@@ -47,12 +52,11 @@ export default function Experience() {
                 <div className="p-3 rounded-lg bg-purple-900/30">
                   <IconBrain className="h-6 w-6 text-purple-400" />
                 </div>
-                <h2 className="text-2xl font-bold text-slate-100">
-                  Revise
-                </h2>
+                <h2 className="text-2xl font-bold text-slate-100">Revise</h2>
               </div>
               <p className="text-slate-300">
-                Strengthen your long-term memory by revisiting key learnings through active recall sessions.
+                Strengthen your long-term memory by revisiting key learnings
+                through active recall sessions.
               </p>
             </CardContent>
           </Card>
@@ -65,12 +69,11 @@ export default function Experience() {
                 <div className="p-3 rounded-lg bg-indigo-900/30">
                   <IconBulb className="h-6 w-6 text-indigo-400" />
                 </div>
-                <h2 className="text-2xl font-bold text-slate-100">
-                  Rewire
-                </h2>
+                <h2 className="text-2xl font-bold text-slate-100">Rewire</h2>
               </div>
               <p className="text-slate-300">
-                Uncover weak spots in your knowledge and reinforce them using spaced repetition techniques.
+                Uncover weak spots in your knowledge and reinforce them using
+                spaced repetition techniques.
               </p>
             </CardContent>
           </Card>
@@ -83,12 +86,11 @@ export default function Experience() {
                 <div className="p-3 rounded-lg bg-green-900/30">
                   <IconMessageCircle className="h-6 w-6 text-green-400" />
                 </div>
-                <h2 className="text-2xl font-bold text-slate-100">
-                  Respond
-                </h2>
+                <h2 className="text-2xl font-bold text-slate-100">Respond</h2>
               </div>
               <p className="text-slate-300">
-                Challenge your understanding with personalized quiz cards and smart feedback loops.
+                Challenge your understanding with personalized quiz cards and
+                smart feedback loops.
               </p>
             </CardContent>
           </Card>

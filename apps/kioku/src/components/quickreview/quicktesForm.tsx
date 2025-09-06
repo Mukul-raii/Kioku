@@ -23,9 +23,8 @@ import { createQuickTest } from "@/app/actions/quick-test";
 import { quickTestSchema } from "@repo/types";
 import { useState } from "react";
 
-export default function QuickTestForm({open,onChange,setQuickTest}) {
+export default function QuickTestForm({ open, onChange, setQuickTest }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
-
 
   const form = useForm<z.infer<typeof quickTestSchema>>({
     resolver: zodResolver(quickTestSchema),
@@ -43,7 +42,7 @@ export default function QuickTestForm({open,onChange,setQuickTest}) {
       const result = await createQuickTest(values);
       if (result.success) {
         console.log("Test created successfully:", result);
-        setQuickTest()
+        setQuickTest();
         onChange(false);
         form.reset();
       }
@@ -54,9 +53,8 @@ export default function QuickTestForm({open,onChange,setQuickTest}) {
     }
   };
 
-
   return (
-    <Dialog open={open} onOpenChange={() =>onChange(false)}>
+    <Dialog open={open} onOpenChange={() => onChange(false)}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Create a Quick Test</DialogTitle>

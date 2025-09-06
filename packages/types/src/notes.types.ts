@@ -79,20 +79,15 @@ export interface LearningLogsResponse {
   learningLogsWithStats: LearningLogWithStats[];
 }
 
-
-
-
 export const quickTestSchema = z.object({
-    category: z.string().min(1, "Category is required"),
-    topic: z.string().min(1, "Topic is required"),
-    difficulty: z.enum(["easy", "medium", "hard"], {
-      required_error: "Please select a difficulty level",
-    }),
-    mode: z.enum(["MCQ", "long_answer"], {
-      required_error: "Please select a test mode",
-    }),
-  });
+  category: z.string().min(1, "Category is required"),
+  topic: z.string().min(1, "Topic is required"),
+  difficulty: z.enum(["easy", "medium", "hard"], {
+    required_error: "Please select a difficulty level",
+  }),
+  mode: z.enum(["MCQ", "long_answer"], {
+    required_error: "Please select a test mode",
+  }),
+});
 
-
-
-  export type QuickTestParams = z.infer<typeof quickTestSchema>;
+export type QuickTestParams = z.infer<typeof quickTestSchema>;

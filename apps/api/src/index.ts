@@ -7,4 +7,3 @@ configDotenv();
 app.listen(process.env.PORT, () => {
   log("Server is Running", process.env.PORT);
 });
- 

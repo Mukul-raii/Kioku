@@ -7,6 +7,10 @@
     "browser/jest-preset.ts",
     "node/jest-preset.ts"
   ],
+  "scripts": {
+    "format": "prettier --write \"**/*.{mjs,json}\"",
+    "format:check": "prettier --check \"**/*.{mjs,json}\""
+  },
   "dependencies": {
     "jest": "^29.7.0",
     "ts-jest": "^29.3.0"

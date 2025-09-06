@@ -6,7 +6,7 @@ import {
   IconNotebook,
   IconCalendarCheck,
   IconChartLine,
-  IconChevronLeft
+  IconChevronLeft,
 } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
 import { useSidebar } from "@/contexts/SidebarContext";
@@ -36,7 +36,7 @@ export function SidebarLayout() {
       href: "/userdashboard/quick-review",
       icon: <IconCalendarCheck className="h-5 w-5 flex-shrink-0" />,
     },
-   /*  {
+    /*  {
       label: "Progress",
       href: "/userdashboard/progress",
       icon: <IconChartBar className="h-5 w-5 flex-shrink-0" />,
@@ -49,13 +49,15 @@ export function SidebarLayout() {
   ];
 
   return (
-    <div className={`fixed left-0 top-0 h-full bg-white shadow-lg border-r border-gray-200 transition-all duration-300 ease-in-out z-40 ${
-      isCollapsed ? "w-16" : "w-64"
-    }`}>
+    <div
+      className={`fixed left-0 top-0 h-full bg-white shadow-lg border-r border-gray-200 transition-all duration-300 ease-in-out z-40 ${
+        isCollapsed ? "w-16" : "w-64"
+      }`}
+    >
       <div className="relative flex items-center justify-between p-4 ">
         {!isCollapsed && (
           <h1
-            onClick={() => router.push('/')}
+            onClick={() => router.push("/")}
             className="text-2xl font-bold tracking-tight bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent cursor-pointer"
           >
             Kioku
@@ -67,8 +69,8 @@ export function SidebarLayout() {
           }`}
           onClick={toggleSidebar}
         >
-          <IconChevronLeft 
-            className={`h-5 w-5 transition-transform duration-200 ${isCollapsed ? "rotate-180" : ""}`} 
+          <IconChevronLeft
+            className={`h-5 w-5 transition-transform duration-200 ${isCollapsed ? "rotate-180" : ""}`}
           />
         </button>
       </div>
@@ -89,7 +91,6 @@ export function SidebarLayout() {
               <span className="font-medium text-sm transition-all duration-300 ease-in-out">
                 {link.label}
               </span>
-
             )}
           </button>
         ))}

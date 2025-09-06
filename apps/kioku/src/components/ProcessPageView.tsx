@@ -29,7 +29,13 @@ import {
   Pie,
   Cell,
 } from "recharts";
-import { IconBrain, IconCalendar, IconChevronUp, IconClock, IconStar } from "@tabler/icons-react";
+import {
+  IconBrain,
+  IconCalendar,
+  IconChevronUp,
+  IconClock,
+  IconStar,
+} from "@tabler/icons-react";
 import DashboardHeader from "./dashboard/dashboard-header";
 import { Suspense } from "react";
 import { Skeleton } from "./ui/skeleton";
@@ -40,14 +46,28 @@ import UpcomingReviews from "./dashboard/upcoming-reviews";
 import RecentLogs from "./dashboard/recent-logs";
 import TopTopics from "./dashboard/top-topics";
 
-const COLORS = ["#8884d8", "#82ca9d", "#ffc658", "#f87171", "#60a5fa", "#facc15"];
+const COLORS = [
+  "#8884d8",
+  "#82ca9d",
+  "#ffc658",
+  "#f87171",
+  "#60a5fa",
+  "#facc15",
+];
 
-export default function ProcessPageView({ progressData }) {
+export default function ProcessPageView({
+  progressData,
+}: {
+  progressData: any;
+}) {
   if (!progressData) {
     return <p className="text-gray-300 text-center">Loading progress...</p>;
   }
 
   return (
-   
-  )
+    <div>
+      {/* TODO: Add progress view implementation */}
+      <p>Progress data loaded</p>
+    </div>
+  );
 }

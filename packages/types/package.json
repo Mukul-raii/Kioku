@@ -24,6 +24,8 @@
   "scripts": {
     "build": "bunchee",
     "dev": "bunchee --watch",
+    "format": "prettier --write \"src/**/*.{ts,js,json}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,js,json}\"",
     "lint": "eslint src/",
     "check-types": "tsc --noEmit",
     "test": "jest"

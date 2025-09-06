@@ -2,7 +2,7 @@ import { Skeleton } from "../ui/skeleton";
 import { Card, CardHeader, CardContent, CardFooter } from "../ui/card";
 import { memo } from "react";
 
-export const ReviewListLoader= memo(function ReviewListLoader() {
+export const ReviewListLoader = memo(function ReviewListLoader() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -31,5 +31,4 @@ export const ReviewListLoader= memo(function ReviewListLoader() {
       </div>
     </div>
   );
-}
-)
+});

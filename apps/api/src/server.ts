@@ -27,9 +27,9 @@ app.use(bodyParser.urlencoded({ limit: "10mb", extended: true }));
 app.use("/api/v1/user", User);
 app.use("/api/v1/learningLog", LearningLog);
 app.use("/api/v1/review", Review);
-app.use("/api/v1/quick_test",QuickTest );
+app.use("/api/v1/quick_test", QuickTest);
 
-main()
+main();
 
 app.use(errrorHandler);
 

@@ -1,18 +1,10 @@
 {
-  "extends": [
-    "//"
-  ],
+  "extends": ["//"],
   "tasks": {
     "build": {
-      "dependsOn": [
-        "^build"
-      ],
-      "outputs": [
-        "dist/**"
-      ],
-      "env": [
-        "PORT"
-      ]
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**"],
+      "env": ["PORT"]
     }
   }
 }

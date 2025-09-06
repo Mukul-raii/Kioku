@@ -1,4 +1,4 @@
-'use client';
+"use client";
 import Experience from "@/components/experience";
 import { SquareHome } from "@/components/SquareHome";
 import { motion } from "framer-motion";

@@ -1,6 +1,5 @@
 {
-    "buildCommand": "npm run build",
-    "outputDirectory": "apps/api/dist",
-    "rootDirectory": "."
-  }
-  
+  "buildCommand": "npm run build",
+  "outputDirectory": "apps/api/dist",
+  "rootDirectory": "."
+}

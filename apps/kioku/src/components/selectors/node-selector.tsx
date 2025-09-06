@@ -12,10 +12,7 @@ import {
   TextQuote,
 } from "lucide-react";
 import { EditorBubbleItem, useEditor } from "novel";
-import {
-  PopoverContent,
-  PopoverTrigger,
-} from "../ui/popover";
+import { PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Popover } from "@radix-ui/react-popover";
 import { Button } from "../ui/button";
 

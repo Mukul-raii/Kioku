@@ -58,9 +58,8 @@ export default function MyNotes({
     if (retentionValue >= 50) return "text-yellow-500";
     return "text-red-500";
   };
-console.log("mynotes ",Data);
+  console.log("mynotes ", Data);
 
-  
   return (
     <div className="my-10">
       {isTable ? (

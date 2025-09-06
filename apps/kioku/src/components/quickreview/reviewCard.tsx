@@ -11,7 +11,7 @@ import {
   Dialog,
   DialogContent,
   DialogHeader,
-  DialogTitle, 
+  DialogTitle,
   DialogDescription,
   DialogTrigger,
 } from "../ui/dialog";
@@ -38,7 +38,12 @@ export const ReviewCard = memo(function ReviewCard({
     setReview(id, type, difficulty);
   }
 
-  function handleSubTopicReview(id: number, test: number, type: string, difficulty: string) {
+  function handleSubTopicReview(
+    id: number,
+    test: number,
+    type: string,
+    difficulty: string
+  ) {
     setSubTopicId(id);
     setReview(test, type, difficulty);
   }
@@ -68,7 +73,9 @@ export const ReviewCard = memo(function ReviewCard({
             </div>
             {isSubtopic && (
               <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">Rating:{item.rating}</span>
+                <span className="text-muted-foreground">
+                  Rating:{item.rating}
+                </span>
               </div>
             )}
           </>
@@ -99,8 +106,8 @@ export const ReviewCard = memo(function ReviewCard({
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="type">Review Type</Label>
-                <select 
-                  value={selectedType} 
+                <select
+                  value={selectedType}
                   onChange={(e) => setSelectedType(e.target.value)}
                   className="flex h-10 w-full  border  bg-background px-3 py-2 text-sm"
                 >
@@ -111,11 +118,11 @@ export const ReviewCard = memo(function ReviewCard({
 
               <div className="space-y-2">
                 <Label htmlFor="difficulty">Difficulty</Label>
-                <select 
-                  value={selectedDifficulty} 
+                <select
+                  value={selectedDifficulty}
                   onChange={(e) => setSelectedDifficulty(e.target.value)}
                   className="flex h-10 w-full  border  bg-background px-3 py-2 text-sm"
-                  style={{ marginBottom: "1rem" ,borderRadius:'none'}}
+                  style={{ marginBottom: "1rem", borderRadius: "none" }}
                 >
                   <option value="Easy">Easy</option>
                   <option value="Medium">Medium</option>
@@ -134,8 +141,19 @@ export const ReviewCard = memo(function ReviewCard({
                 <Button
                   className="flex-1"
                   onClick={() => {
-                    if (!isSubtopic) handleTopicReview(item.id,selectedType,selectedDifficulty);
-                    else handleSubTopicReview(item.id, item.test,selectedType,selectedDifficulty);
+                    if (!isSubtopic)
+                      handleTopicReview(
+                        item.id,
+                        selectedType,
+                        selectedDifficulty
+                      );
+                    else
+                      handleSubTopicReview(
+                        item.id,
+                        item.test,
+                        selectedType,
+                        selectedDifficulty
+                      );
                   }}
                   disabled={!selectedType || !selectedDifficulty}
                 >

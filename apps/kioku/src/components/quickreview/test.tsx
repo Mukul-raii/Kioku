@@ -257,7 +257,9 @@ export default function TestDialog({
                         <Button
                           className="flex items-center gap-2 border rounded-md px-2 cursor-pointer"
                           disabled={isSetRating || isSubmitting}
-                          onClick={() => {setIsSetRating(true)}}
+                          onClick={() => {
+                            setIsSetRating(true);
+                          }}
                         >
                           <IconCircleCheck className="h-4 w-4" />
                           Answer

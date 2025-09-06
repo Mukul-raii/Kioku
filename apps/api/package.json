@@ -7,6 +7,8 @@
     "dev": "tsup src/index.ts --watch --onSuccess \"node dist/index.js\"",
     "build": "tsup",
     "check-types": "tsc --noEmit",
+    "format": "prettier --write \"src/**/*.{ts,js,json}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,js,json}\"",
     "lint": "eslint src/ --max-warnings 0",
     "test": "jest --detectOpenHandles"
   },

@@ -6,6 +6,8 @@
   "scripts": {
     "build": "next build",
     "dev": "next dev ",
+    "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,json,css,scss,md}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx,js,jsx,json,css,scss,md}\"",
     "lint": "next lint",
     "check-types": "tsc --noEmit",
     "start": "next start"

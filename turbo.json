@@ -23,6 +23,14 @@
     "check-types": {
       "dependsOn": ["^build", "^check-types"]
     },
+    "format": {
+      "outputs": [],
+      "dependsOn": []
+    },
+    "format:check": {
+      "outputs": [],
+      "dependsOn": []
+    },
     "dev": {
       "dependsOn": ["^build"],
       "cache": false,

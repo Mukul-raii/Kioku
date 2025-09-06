@@ -1,17 +1,3 @@
-
-
-
-
-export const QuickTestDialog = ({
-    id,
-    testData,
-}) => {
-
-
-    return(
-        <>
-        
-        </>
-    )
-
+export const QuickTestDialog = ({ id, testData }) => {
+  return <></>;
 };

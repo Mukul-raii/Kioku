@@ -6,17 +6,16 @@ export async function main() {
 
   const quickTestData = await prisma.quickQuiz.findFirst({
     where: {
-      id: quickTestId
+      id: quickTestId,
     },
     include: {
       review: {
         include: {
-          testResult: true
-        }
-      }
-    }
+          testResult: true,
+        },
+      },
+    },
   });
 
   console.log(quickTestData);
 }
-

@@ -15,13 +15,13 @@ export const generate_test = async (params: {
   mode: string;
   difficulty: string;
 }) => {
-  const { prompt, outputStructure,difficulty } = params;
+  const { prompt, outputStructure, difficulty } = params;
   const response = await ai.models.generateContent({
     model: "gemini-2.0-flash",
     contents: [
       {
         role: "user",
-        parts: [{ text: prompt  }],
+        parts: [{ text: prompt }],
       },
     ],
     config: {
@@ -55,8 +55,8 @@ export class generate_test_model {
     isSubTopic: boolean;
   }) {
     const { prompt, mode, difficulty, isSubTopic } = params;
-    console.log("Generating test with params:", mode,difficulty);
-    
+    console.log("Generating test with params:", mode, difficulty);
+
     if (isSubTopic) {
       return await this.generate_sub_topic_test({ prompt, mode, difficulty });
     } else {
@@ -64,13 +64,13 @@ export class generate_test_model {
     }
   }
 
-  static async generateQuizTest(params:{
+  static async generateQuizTest(params: {
     prompt: string;
     mode: string;
     difficulty: string;
-  }){
+  }) {
     const { prompt, mode, difficulty } = params;
-    console.log(prompt,mode,difficulty)
+    console.log(prompt, mode, difficulty);
     let response;
     if (mode === "MCQ") {
       response = await generate_test({
@@ -140,9 +140,8 @@ export class generate_test_model {
       });
     }
 
+    console.log("final test generated ", response);
 
-    console.log("final test generated ",response);
-    
     return response;
   }
 }

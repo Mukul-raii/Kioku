@@ -1,4 +1,3 @@
-
 ## What's Inside?
 
 This monorepo, built with Turborepo, includes the following applications and packages:
@@ -15,4 +14,3 @@ This monorepo, built with Turborepo, includes the following applications and pac
 - **`@repo/logger`**: A lightweight, isomorphic logging utility.
 - **`@repo/typescript-config`**: Shared `tsconfig.json` files for TypeScript projects.
 - **`@repo/types`**: Reusable TypeScript types for the entire monorepo.
-

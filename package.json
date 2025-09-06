@@ -5,7 +5,8 @@
     "build": "npm --prefix packages/logger run build && npm --prefix apps/api run build",
     "clean": "turbo run clean",
     "dev": "turbo run dev",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,css,scss,yaml,yml}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md,css,scss,yaml,yml}\"",
     "lint": "turbo run lint",
     "test": "turbo run test",
     "check-types": "turbo run check-types"

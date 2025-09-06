@@ -61,14 +61,19 @@ export const check_test_result = async ({
     }
   );
   console.log("check_test_result response:", response.data);
-  
+
   return response.data.data.test;
 };
 
-export const get_a_test = async (id: number, isSubtopic: number,reviewType:string,reviewDifficulty:string) => {
+export const get_a_test = async (
+  id: number,
+  isSubtopic: number,
+  reviewType: string,
+  reviewDifficulty: string
+) => {
   const { getToken } = await auth();
   const token = await getToken();
- 
+
   const response = await axios.post(
     `${process.env.NEXT_PUBLIC_BACKEND_API}/learningLog/get_a_test/${id}/${isSubtopic}`,
     {

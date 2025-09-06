@@ -1,14 +1,17 @@
 import { log } from "@repo/logger";
 import IORedis from "ioredis";
 
- const redis = new IORedis(process.env.REDIS_URL || "redis://localhost:6379");
-//clean redis cache 
+const redis = new IORedis(process.env.REDIS_URL || "redis://localhost:6379");
+//clean redis cache
 if (process.env.REDIS_URL) {
-  redis.flushall().then(() => {
-    log("✅ Redis cache cleared.");
-  }).catch((err) => {
-    log("❌ Failed to clear Redis cache:", err);
-  });
+  redis
+    .flushall()
+    .then(() => {
+      log("✅ Redis cache cleared.");
+    })
+    .catch((err) => {
+      log("❌ Failed to clear Redis cache:", err);
+    });
 }
 
 redis.on("connect", () => {
@@ -22,6 +25,5 @@ redis.on("ready", () => {
 redis.on("error", (err) => {
   log("❌ Redis error:", err);
 });
-
 
 export default redis;

@@ -10,6 +10,10 @@
     "./remix": "./remix.js",
     "./vite": "./vite.js"
   },
+  "scripts": {
+    "format": "prettier --write \"*.{js,json}\"",
+    "format:check": "prettier --check \"*.{js,json}\""
+  },
   "devDependencies": {
     "@eslint/js": "^9.24.0",
     "@next/eslint-plugin-next": "^15.3.0",

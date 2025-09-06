@@ -1,7 +1,1 @@
-
-
-
-
-export default function CheckResultData() {
-    
-}
+export default function CheckResultData() {}

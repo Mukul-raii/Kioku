@@ -1,12 +1,3 @@
-
-
-
-export default function ErrorHandler(error){
-
-    return(
-        <div>
-            
-        </div>
-    )
-
+export default function ErrorHandler(error) {
+  return <div></div>;
 }

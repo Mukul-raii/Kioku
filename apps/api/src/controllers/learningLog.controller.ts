@@ -240,7 +240,7 @@ export const generate_a_Test = async (
   const userId = req.auth.userId;
   const { id, isSubTopic } = req.params;
   const { mode, difficulty }: { mode: string; difficulty: string } = req.body;
-  console.log(userId, id, isSubTopic,mode,difficulty);
+  console.log(userId, id, isSubTopic, mode, difficulty);
 
   if (!userId) {
     sendError(res, 401, "Unauthorized - User ID not found");
@@ -273,7 +273,7 @@ export const check_The_Result = async (
 ): Promise<void> => {
   const { question, correctAnswer, userAnswer } = req.body;
   const userId = req.auth.userId;
-  
+
   if (!userId) {
     sendError(res, 401, "Unauthorized - User ID not found");
     return;
@@ -292,11 +292,10 @@ export const check_The_Result = async (
     const testAnswer = await resultGenerateModel(
       `"Question: "${question}+",Correct Answer :"+${correctAnswer}+" User Answer To Check: " +${userAnswer}`
     );
-    
+
     sendResponse(res, 200, "Check Generated Successfully", {
       test: testAnswer,
     });
-    
   } catch (error) {
     sendError(res, 500, "Failed to check answer", error);
   }
@@ -308,8 +307,6 @@ export const generate_a_Result_New_Topic = async (
 ): Promise<void> => {
   const { id, result } = req.body; //learning log id
   const userId = req.auth.userId;
-
-  
 };
 
 export const generate_a_Result_Sub_Topic = async (

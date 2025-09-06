@@ -1,11 +1,20 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Link from "next/link"
-import { IconChartBar, IconBook2, IconCalendar, IconLayoutDashboard, IconListCheck, IconLogout, IconSettings, IconUser } from "@tabler/icons-react"
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { usePathname } from "next/navigation"
+import { useState } from "react";
+import Link from "next/link";
+import {
+  IconChartBar,
+  IconBook2,
+  IconCalendar,
+  IconLayoutDashboard,
+  IconListCheck,
+  IconLogout,
+  IconSettings,
+  IconUser,
+} from "@tabler/icons-react";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { usePathname } from "next/navigation";
 
 const navItems = [
   { name: "Dashboard", href: "/dashboard", icon: IconLayoutDashboard },
@@ -13,17 +22,17 @@ const navItems = [
   { name: "Reviews", href: "/reviews", icon: IconListCheck },
   { name: "Schedule", href: "/schedule", icon: IconCalendar },
   { name: "Analytics", href: "/analytics", icon: IconChartBar },
-]
+];
 
 export default function DashboardSidebar() {
-  const [collapsed, setCollapsed] = useState(false)
-  const pathname = usePathname()
+  const [collapsed, setCollapsed] = useState(false);
+  const pathname = usePathname();
 
   return (
     <div
       className={cn(
         "h-screen bg-white dark:bg-gray-950 border-r border-gray-200 dark:border-gray-800 transition-all duration-300 ease-in-out",
-        collapsed ? "w-16" : "w-64",
+        collapsed ? "w-16" : "w-64"
       )}
     >
       <div className="flex flex-col h-full">
@@ -39,7 +48,12 @@ export default function DashboardSidebar() {
               <IconBook2 className="h-6 w-6 text-primary" />
             </div>
           )}
-          <Button variant="ghost" size="icon" onClick={() => setCollapsed(!collapsed)} className="ml-auto">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setCollapsed(!collapsed)}
+            className="ml-auto"
+          >
             {collapsed ? (
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -84,7 +98,7 @@ export default function DashboardSidebar() {
                     "flex items-center rounded-md px-3 py-2 text-sm font-medium transition-colors",
                     pathname === item.href
                       ? "bg-primary/10 text-primary"
-                      : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800",
+                      : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
                   )}
                 >
                   <item.icon className="h-5 w-5 mr-3" />
@@ -103,12 +117,19 @@ export default function DashboardSidebar() {
             {!collapsed && (
               <div className="ml-3">
                 <p className="text-sm font-medium">User Name</p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">user@example.com</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  user@example.com
+                </p>
               </div>
             )}
           </div>
           <div className="mt-4 flex flex-col space-y-2">
-            <Button variant="ghost" size={collapsed ? "icon" : "sm"} className="justify-start" asChild>
+            <Button
+              variant="ghost"
+              size={collapsed ? "icon" : "sm"}
+              className="justify-start"
+              asChild
+            >
               <Link href="/settings">
                 <IconSettings className="h-4 w-4 mr-2" />
                 {!collapsed && <span>Settings</span>}
@@ -126,5 +147,5 @@ export default function DashboardSidebar() {
         </div>
       </div>
     </div>
-  )
+  );
 }
